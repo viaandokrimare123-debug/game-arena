@@ -1,2666 +1,1052 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="google-site-verification" content="KymRAgiQ3To-fdJ_7XduwY8VjBn8gHIoZD6cQEq6R6A">
-<title>Rival Zombie Arena</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underground Zombie Survival</title>
 
 <style>
-body{
-    margin:0;
-    overflow:hidden;
-    background:#080810;
-    font-family:Arial,sans-serif;
-    color:white;
+* {
+    box-sizing: border-box;
 }
 
-canvas{display:block}
-
-#hud{
-    position:fixed;
-    top:15px;
-    left:15px;
-    z-index:20;
-    background:rgba(5,5,15,.85);
-    border:2px solid #00d9ff;
-    border-radius:10px;
-    padding:12px 16px;
-    min-width:230px;
-    box-shadow:0 0 20px rgba(0,200,255,.2);
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #080810;
+    font-family: Arial, sans-serif;
+    color: white;
 }
 
-.hpbar{
-    width:200px;
-    height:14px;
-    background:#222;
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:5px;
+canvas {
+    display: block;
+    background: #11131a;
 }
 
-#hpbar{
-    width:100%;
-    height:100%;
-    background:#25e878;
+#hud {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 20;
+    background: rgba(5,5,10,.85);
+    padding: 12px 16px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
-#weaponName{
-    margin-top:8px;
-    color:#00eaff;
-    font-weight:bold;
+#help {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    z-index: 20;
+    background: rgba(5,5,10,.75);
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: #ccc;
 }
 
-#crosshair{
-    position:fixed;
-    left:50%;
-    top:50%;
-    width:20px;
-    height:20px;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-    z-index:30;
+#gameOver {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0,0,0,.8);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
-#crosshair:before,
-#crosshair:after{
-    content:"";
-    position:absolute;
-    background:white;
+#gameOver h1 {
+    color: #ff3333;
+    font-size: 60px;
+    margin: 10px;
 }
 
-#crosshair:before{
-    width:20px;
-    height:2px;
-    top:9px;
-    left:0;
-}
-
-#crosshair:after{
-    width:2px;
-    height:20px;
-    left:9px;
-    top:0;
-}
-
-#weaponBar{
-    position:fixed;
-    bottom:15px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:8px;
-    z-index:20;
-}
-
-.slot{
-    width:120px;
-    height:58px;
-    background:rgba(10,10,25,.9);
-    border:2px solid #444;
-    border-radius:8px;
-    padding:6px;
-    text-align:center;
-    font-size:11px;
-}
-
-.slot.active{
-    border-color:#00eaff;
-    box-shadow:0 0 15px #00eaff;
-}
-
-.slot b{
-    color:#00eaff;
-    display:block;
-    font-size:13px;
-}
-
-#inventory{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:100;
-    background:rgba(3,3,10,.94);
-    padding:25px;
-    overflow:auto;
-}
-
-#inventory h1{
-    text-align:center;
-    color:#00eaff;
-}
-
-.inventoryLayout{
-    display:flex;
-    gap:20px;
-    max-width:1200px;
-    margin:auto;
-}
-
-.loadout{
-    width:260px;
-    background:#111122;
-    border:2px solid #00aaff;
-    border-radius:12px;
-    padding:15px;
-}
-
-.loadoutSlot{
-    margin:8px 0;
-    padding:12px;
-    border:1px solid #555;
-    border-radius:7px;
-    background:#19192b;
-}
-
-.loadoutSlot.selected{
-    border-color:#00eaff;
-}
-
-.weaponList{
-    flex:1;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:8px;
-}
-
-.weaponButton{
-    background:#171727;
-    border:1px solid #444;
-    color:white;
-    padding:12px;
-    border-radius:7px;
-    cursor:pointer;
-}
-
-.weaponButton:hover{
-    border-color:#00eaff;
-    background:#202040;
-}
-
-.weaponButton small{color:#aaa}
-
-#closeInventory{
-    position:fixed;
-    top:15px;
-    right:20px;
-    background:#e33;
-    color:white;
-    border:0;
-    padding:10px 18px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-#startScreen,
-#gameOver{
-    position:fixed;
-    inset:0;
-    z-index:200;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:rgba(3,3,10,.96);
-}
-
-#gameOver{display:none}
-
-.panel{
-    max-width:650px;
-    padding:35px;
-    text-align:center;
-    background:#101020;
-    border:2px solid #00eaff;
-    border-radius:15px;
-}
-
-button{
-    background:#00bfff;
-    color:white;
-    border:0;
-    border-radius:7px;
-    padding:13px 25px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-#damageFlash{
-    position:fixed;
-    inset:0;
-    background:rgba(255,0,0,.3);
-    opacity:0;
-    pointer-events:none;
-    z-index:50;
-}
-
-#slideText{
-    position:fixed;
-    bottom:90px;
-    left:50%;
-    transform:translateX(-50%);
-    color:#00eaff;
-    font-weight:bold;
-    opacity:0;
-    z-index:40;
-}
-
-#jumpText{
-    position:fixed;
-    bottom:120px;
-    left:50%;
-    transform:translateX(-50%);
-    color:#fff;
-    font-weight:bold;
-    opacity:0;
-    z-index:40;
+#gameOver button {
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="game"></canvas>
+
 <div id="hud">
-    <div>HP: <span id="hpText">100</span>/100</div>
-
-    <div class="hpbar">
-        <div id="hpbar"></div>
-    </div>
-
-    <div>Score: <span id="score">0</span></div>
-    <div>Level: <span id="level">1</span></div>
-    <div>XP: <span id="xp">0</span></div>
-
-    <div id="weaponName">Assault Rifle</div>
+    ❤️ Health: <span id="health">100</span>
+    &nbsp;&nbsp;
+    🔫 Ammo: <span id="ammo">60</span>
+    &nbsp;&nbsp;
+    🧟 Zombies: <span id="zombies">0</span>
 </div>
 
-<div id="crosshair"></div>
-<div id="damageFlash"></div>
-
-<div id="slideText">SLIDE</div>
-<div id="jumpText">JUMP</div>
-
-<div id="weaponBar">
-
-    <div class="slot active" id="slot1">
-        <b>1</b>
-        PRIMARY
-        <br>
-        Assault Rifle
-    </div>
-
-    <div class="slot" id="slot2">
-        <b>2</b>
-        SECONDARY
-        <br>
-        Handgun
-    </div>
-
-    <div class="slot" id="slot3">
-        <b>3</b>
-        MELEE
-        <br>
-        Katana
-    </div>
-
-    <div class="slot" id="slot4">
-        <b>4</b>
-        SPECIAL
-        <br>
-        RPG
-    </div>
-
+<div id="help">
+    WASD / Arrow Keys = Move &nbsp; | &nbsp;
+    SPACE = Jump &nbsp; | &nbsp;
+    Mouse = Aim &nbsp; | &nbsp;
+    Left Click = Shoot
 </div>
-
-<!-- INVENTORY -->
-
-<div id="inventory">
-
-    <button id="closeInventory">
-        CLOSE [ ` ]
-    </button>
-
-    <h1>LOADOUT INVENTORY</h1>
-
-    <p style="text-align:center;color:#aaa">
-        Select a slot on the left, then choose a weapon.
-    </p>
-
-    <div class="inventoryLayout">
-
-        <div class="loadout">
-
-            <h2>YOUR LOADOUT</h2>
-
-            <div
-                class="loadoutSlot selected"
-                id="loadoutPrimary"
-                onclick="chooseSlot('primary')">
-                <b>PRIMARY</b>
-                <br>
-                <span>Assault Rifle</span>
-            </div>
-
-            <div
-                class="loadoutSlot"
-                id="loadoutSecondary"
-                onclick="chooseSlot('secondary')">
-                <b>SECONDARY</b>
-                <br>
-                <span>Handgun</span>
-            </div>
-
-            <div
-                class="loadoutSlot"
-                id="loadoutMelee"
-                onclick="chooseSlot('melee')">
-                <b>MELEE</b>
-                <br>
-                <span>Katana</span>
-            </div>
-
-            <div
-                class="loadoutSlot"
-                id="loadoutSpecial"
-                onclick="chooseSlot('special')">
-                <b>SPECIAL</b>
-                <br>
-                <span>RPG</span>
-            </div>
-
-        </div>
-
-        <div class="weaponList" id="weaponList"></div>
-
-    </div>
-</div>
-
-<!-- START -->
-
-<div id="startScreen">
-
-    <div class="panel">
-
-        <h1>RIVAL ZOMBIE ARENA</h1>
-
-        <p>Fast FPS zombie arena.</p>
-
-        <p>
-            ⬆️⬇️⬅️➡️ Move
-            <br>
-            <b>SPACE = Jump</b>
-            <br>
-            🖱️ Mouse = Aim
-            <br>
-            🖱️ Left Click = Attack
-            <br>
-            <b>C = Slide</b>
-            <br>
-            <b>` = Inventory</b>
-            <br>
-            1 = Primary
-            2 = Secondary
-            3 = Melee
-            4 = Special
-        </p>
-
-        <button id="startButton">
-            ENTER ARENA
-        </button>
-
-    </div>
-</div>
-
-<!-- GAME OVER -->
 
 <div id="gameOver">
-
-    <div class="panel">
-
-        <h1>YOU DIED</h1>
-
-        <p>
-            Score:
-            <span id="finalScore">0</span>
-        </p>
-
-        <button onclick="location.reload()">
-            PLAY AGAIN
-        </button>
-
-    </div>
+    <h1>YOU DIED</h1>
+    <p>The zombies got you.</p>
+    <button onclick="location.reload()">RESTART</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-
 <script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-/* =========================================================
-   WEAPONS
-========================================================= */
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
 
-const weaponDatabase = {
+resize();
+window.addEventListener("resize", resize);
 
-primary:[
-    {
-        name:"Assault Rifle",
-        type:"gun",
-        damage:25,
-        fireRate:110,
-        speed:1.5,
-        color:0x333333,
-        bulletColor:0xffff00
-    },
-    {
-        name:"Shotgun",
-        type:"shotgun",
-        damage:18,
-        fireRate:650,
-        speed:1.3,
-        color:0x552211,
-        bulletColor:0xffaa00
-    },
-    {
-        name:"Sniper",
-        type:"sniper",
-        damage:120,
-        fireRate:1000,
-        speed:3,
-        color:0x222222,
-        bulletColor:0xffffff
-    },
-    {
-        name:"SMG",
-        type:"smg",
-        damage:14,
-        fireRate:55,
-        speed:1.6,
-        color:0x222233,
-        bulletColor:0x00ffff
-    },
-    {
-        name:"Minigun",
-        type:"minigun",
-        damage:9,
-        fireRate:40,
-        speed:1.8,
-        color:0x333333,
-        bulletColor:0xff8800
-    },
-    {
-        name:"Bow",
-        type:"bow",
-        damage:85,
-        fireRate:700,
-        speed:1.2,
-        color:0x552211,
-        bulletColor:0xffffff
-    },
-    {
-        name:"Crossbow",
-        type:"crossbow",
-        damage:100,
-        fireRate:850,
-        speed:1.5,
-        color:0x333333,
-        bulletColor:0xffffff
-    },
-    {
-        name:"RPG",
-        type:"rpg",
-        damage:150,
-        fireRate:1100,
-        speed:.65,
-        color:0x345533,
-        bulletColor:0xff4400
-    },
-    {
-        name:"Grenade Launcher",
-        type:"grenadelauncher",
-        damage:100,
-        fireRate:800,
-        speed:.75,
-        color:0x444444,
-        bulletColor:0xff5500
-    },
-    {
-        name:"Energy Rifle",
-        type:"energy",
-        damage:30,
-        fireRate:100,
-        speed:1.8,
-        color:0x116688,
-        bulletColor:0x00ffff
-    }
-],
+/* =========================
+   WORLD
+========================= */
 
-secondary:[
-    {
-        name:"Handgun",
-        type:"gun",
-        damage:30,
-        fireRate:220,
-        speed:1.6,
-        color:0x222222,
-        bulletColor:0xffff00
-    },
-    {
-        name:"Revolver",
-        type:"gun",
-        damage:55,
-        fireRate:450,
-        speed:2,
-        color:0x444444,
-        bulletColor:0xffcc00
-    },
-    {
-        name:"Uzi",
-        type:"smg",
-        damage:14,
-        fireRate:65,
-        speed:1.7,
-        color:0x222222,
-        bulletColor:0xffee00
-    },
-    {
-        name:"Flare Gun",
-        type:"gun",
-        damage:50,
-        fireRate:700,
-        speed:1,
-        color:0x773322,
-        bulletColor:0xff3300
-    },
-    {
-        name:"Energy Pistols",
-        type:"dual",
-        damage:20,
-        fireRate:90,
-        speed:1.8,
-        color:0x225566,
-        bulletColor:0x00ffff
-    }
-],
-
-melee:[
-    {
-        name:"Katana",
-        type:"melee",
-        damage:100,
-        fireRate:450,
-        range:4,
-        color:0xcccccc
-    },
-    {
-        name:"Knife",
-        type:"melee",
-        damage:60,
-        fireRate:280,
-        range:3,
-        color:0x999999
-    },
-    {
-        name:"Battle Axe",
-        type:"melee",
-        damage:120,
-        fireRate:700,
-        range:4,
-        color:0x555555
-    },
-    {
-        name:"Spear",
-        type:"melee",
-        damage:85,
-        fireRate:500,
-        range:5,
-        color:0x777777
-    },
-    {
-        name:"Chainsaw",
-        type:"chainsaw",
-        damage:18,
-        fireRate:70,
-        range:3,
-        color:0x444444
-    },
-    {
-        name:"Fists",
-        type:"melee",
-        damage:30,
-        fireRate:250,
-        range:2.8,
-        color:0xffaa88
-    }
-],
-
-special:[
-    {
-        name:"RPG",
-        type:"rpg",
-        damage:150,
-        fireRate:1100,
-        speed:.65,
-        color:0x335533,
-        bulletColor:0xff3300
-    },
-    {
-        name:"Grenade",
-        type:"grenade",
-        damage:100,
-        fireRate:900,
-        speed:.7,
-        color:0x334433,
-        bulletColor:0xff5500
-    },
-    {
-        name:"Grappler",
-        type:"grappler",
-        damage:0,
-        fireRate:600,
-        speed:2,
-        color:0x555555
-    },
-    {
-        name:"Medkit",
-        type:"medkit",
-        damage:0,
-        fireRate:800,
-        color:0xffffff
-    },
-    {
-        name:"Freeze Ray",
-        type:"freeze",
-        damage:20,
-        fireRate:200,
-        speed:1.6,
-        color:0x55bbff,
-        bulletColor:0x00ffff
-    },
-    {
-        name:"Flashbang",
-        type:"flash",
-        damage:0,
-        fireRate:900,
-        speed:.7,
-        color:0xdddddd,
-        bulletColor:0xffffff
-    },
-    {
-        name:"Molotov",
-        type:"molotov",
-        damage:80,
-        fireRate:900,
-        speed:.65,
-        color:0x663300,
-        bulletColor:0xff3300
-    }
-]
+const world = {
+    width: 5000,
+    floor: 560
 };
 
+/* =========================
+   PLAYER
+========================= */
 
-/* =========================================================
-   LOADOUT
-========================================================= */
+const player = {
+    x: 400,
+    y: 400,
 
-let loadout={
-    primary:weaponDatabase.primary[0],
-    secondary:weaponDatabase.secondary[0],
-    melee:weaponDatabase.melee[0],
-    special:weaponDatabase.special[0]
+    width: 32,
+    height: 55,
+
+    vx: 0,
+    vy: 0,
+
+    speed: 4,
+    jumpPower: 13,
+
+    grounded: false,
+
+    health: 100,
+    ammo: 60,
+
+    facing: 1
 };
 
-let selectedLoadoutSlot="primary";
+/* =========================
+   INPUT
+========================= */
 
-function chooseSlot(slot){
+const keys = {};
 
-    selectedLoadoutSlot=slot;
+window.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
 
-    document
-        .querySelectorAll(".loadoutSlot")
-        .forEach(x=>x.classList.remove("selected"));
+    if (e.code === "Space") {
+        e.preventDefault();
 
-    const id={
-        primary:"loadoutPrimary",
-        secondary:"loadoutSecondary",
-        melee:"loadoutMelee",
-        special:"loadoutSpecial"
-    }[slot];
+        if (player.grounded) {
+            player.vy = -player.jumpPower;
+            player.grounded = false;
+        }
+    }
+});
 
-    document
-        .getElementById(id)
-        .classList.add("selected");
-}
+window.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
 
-function buildInventory(){
+/* =========================
+   MOUSE
+========================= */
 
-    const list=document.getElementById("weaponList");
+const mouse = {
+    x: 0,
+    y: 0,
+    down: false
+};
 
-    list.innerHTML="";
+canvas.addEventListener("mousemove", e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
 
-    Object.keys(weaponDatabase).forEach(category=>{
+canvas.addEventListener("mousedown", () => {
+    mouse.down = true;
+});
 
-        weaponDatabase[category].forEach(weapon=>{
+window.addEventListener("mouseup", () => {
+    mouse.down = false;
+});
 
-            const button=document.createElement("button");
+/* =========================
+   BOXES
+========================= */
 
-            button.className="weaponButton";
+const boxes = [
+    {x: 700, y: 480, w: 100, h: 80},
+    {x: 900, y: 400, w: 100, h: 160},
 
-            button.innerHTML=
-                `<b>${weapon.name}</b>
-                <br>
-                <small>${category.toUpperCase()}</small>`;
+    {x: 1250, y: 470, w: 110, h: 90},
+    {x: 1450, y: 380, w: 110, h: 180},
 
-            button.onclick=()=>{
+    {x: 1900, y: 460, w: 100, h: 100},
+    {x: 2050, y: 380, w: 100, h: 180},
 
-                loadout[selectedLoadoutSlot]=weapon;
+    {x: 2600, y: 450, w: 130, h: 110},
+    {x: 2850, y: 350, w: 120, h: 210},
 
-                updateLoadoutUI();
-                updateCurrentWeapon();
+    {x: 3300, y: 470, w: 110, h: 90},
+    {x: 3500, y: 400, w: 110, h: 160},
 
-            };
+    {x: 4000, y: 450, w: 130, h: 110},
+    {x: 4250, y: 350, w: 120, h: 210}
+];
 
-            list.appendChild(button);
+/* =========================
+   ZOMBIES
+========================= */
 
-        });
+const zombies = [];
 
+function spawnZombie(x, y) {
+    zombies.push({
+        x,
+        y,
+        width: 35,
+        height: 55,
+
+        vx: 0,
+        vy: 0,
+
+        health: 100,
+        speed: 1.2,
+
+        grounded: false,
+
+        attackCooldown: 0
     });
 }
 
-function updateLoadoutUI(){
+spawnZombie(1100, 505);
+spawnZombie(1600, 505);
+spawnZombie(2200, 505);
+spawnZombie(2450, 505);
+spawnZombie(3100, 505);
+spawnZombie(3700, 505);
+spawnZombie(4500, 505);
 
-    document.querySelector("#loadoutPrimary span").textContent=
-        loadout.primary.name;
+/* =========================
+   BULLETS
+========================= */
 
-    document.querySelector("#loadoutSecondary span").textContent=
-        loadout.secondary.name;
+const bullets = [];
 
-    document.querySelector("#loadoutMelee span").textContent=
-        loadout.melee.name;
+function shoot() {
 
-    document.querySelector("#loadoutSpecial span").textContent=
-        loadout.special.name;
+    if (player.ammo <= 0) return;
 
-    updateWeaponBar();
-}
+    player.ammo--;
 
-function getCurrentWeapon(){
+    const worldMouseX =
+        mouse.x + camera.x;
 
-    if(currentSlot===1) return loadout.primary;
-    if(currentSlot===2) return loadout.secondary;
-    if(currentSlot===3) return loadout.melee;
+    const worldMouseY =
+        mouse.y + camera.y;
 
-    return loadout.special;
-}
+    const dx =
+        worldMouseX -
+        (player.x + player.width / 2);
 
+    const dy =
+        worldMouseY -
+        (player.y + player.height / 2);
 
-/* =========================================================
-   GAME VARIABLES
-========================================================= */
+    const length = Math.sqrt(dx * dx + dy * dy);
 
-let scene;
-let camera;
-let renderer;
-let controls;
+    bullets.push({
+        x: player.x + player.width / 2,
+        y: player.y + player.height / 2,
 
-let currentSlot=1;
-let lastShot=0;
-let shooting=false;
+        vx: dx / length * 12,
+        vy: dy / length * 12,
 
-let playerHP=100;
-let score=0;
-let xp=0;
-let level=1;
-
-let zombies=[];
-let bullets=[];
-let explosions=[];
-let coverBoxes=[];
-
-let keys={};
-
-let sliding=false;
-let slideTimer=0;
-
-let slideDirection=new THREE.Vector3();
-
-let gunMesh;
-
-let gameStarted=false;
-let gameOver=false;
-
-
-/* =========================================================
-   JUMP VARIABLES
-========================================================= */
-
-let verticalVelocity=0;
-let onGround=true;
-
-const gravity=0.012;
-const jumpPower=0.25;
-const playerRadius=.45;
-
-
-/* =========================================================
-   HUD
-========================================================= */
-
-function updateHUD(){
-
-    document.getElementById("hpText").textContent=
-        Math.max(0,Math.round(playerHP));
-
-    document.getElementById("hpbar").style.width=
-        Math.max(0,playerHP)+"%";
-
-    document.getElementById("score").textContent=score;
-    document.getElementById("xp").textContent=xp;
-    document.getElementById("level").textContent=level;
-
-    document.getElementById("weaponName").textContent=
-        getCurrentWeapon().name;
-}
-
-function updateWeaponBar(){
-
-    document.getElementById("slot1").innerHTML=
-        `<b>1</b>PRIMARY<br>${loadout.primary.name}`;
-
-    document.getElementById("slot2").innerHTML=
-        `<b>2</b>SECONDARY<br>${loadout.secondary.name}`;
-
-    document.getElementById("slot3").innerHTML=
-        `<b>3</b>MELEE<br>${loadout.melee.name}`;
-
-    document.getElementById("slot4").innerHTML=
-        `<b>4</b>SPECIAL<br>${loadout.special.name}`;
-
-    for(let i=1;i<=4;i++){
-
-        document
-            .getElementById("slot"+i)
-            .classList.toggle(
-                "active",
-                i===currentSlot
-            );
-    }
-}
-
-
-/* =========================================================
-   WEAPON MODEL
-========================================================= */
-
-function updateCurrentWeapon(){
-
-    if(gunMesh){
-
-        camera.remove(gunMesh);
-        gunMesh=null;
-
-    }
-
-    const weapon=getCurrentWeapon();
-
-    if(weapon.type==="melee"){
-
-        gunMesh=createSword(weapon.color);
-
-    }
-    else if(weapon.type==="chainsaw"){
-
-        gunMesh=createChainsaw();
-
-    }
-    else if(weapon.type==="grappler"){
-
-        gunMesh=createGrappler();
-
-    }
-    else if(weapon.type==="medkit"){
-
-        gunMesh=createMedkit();
-
-    }
-    else{
-
-        gunMesh=createGun(weapon);
-
-    }
-
-    camera.add(gunMesh);
-
-    updateHUD();
-    updateWeaponBar();
-}
-
-
-/* =========================================================
-   GUN
-========================================================= */
-
-function createGun(weapon){
-
-    const group=new THREE.Group();
-
-    const body=new THREE.Mesh(
-        new THREE.BoxGeometry(.25,.25,.9),
-        new THREE.MeshStandardMaterial({
-            color:weapon.color,
-            metalness:.8,
-            roughness:.25
-        })
-    );
-
-    body.position.set(.35,-.28,-.55);
-
-    group.add(body);
-
-    const barrel=new THREE.Mesh(
-        new THREE.CylinderGeometry(.055,.055,.7,10),
-        new THREE.MeshStandardMaterial({
-            color:0x111111,
-            metalness:.9
-        })
-    );
-
-    barrel.rotation.x=Math.PI/2;
-    barrel.position.set(.35,-.28,-.98);
-
-    group.add(barrel);
-
-    const grip=new THREE.Mesh(
-        new THREE.BoxGeometry(.14,.35,.18),
-        new THREE.MeshStandardMaterial({
-            color:0x181818
-        })
-    );
-
-    grip.position.set(.35,-.48,-.35);
-    grip.rotation.x=-.2;
-
-    group.add(grip);
-
-    return group;
-}
-
-function createSword(color){
-
-    const group=new THREE.Group();
-
-    const blade=new THREE.Mesh(
-        new THREE.BoxGeometry(.08,.08,1.5),
-        new THREE.MeshStandardMaterial({
-            color:color,
-            metalness:.9
-        })
-    );
-
-    blade.position.set(.45,-.3,-.8);
-    group.add(blade);
-
-    const handle=new THREE.Mesh(
-        new THREE.BoxGeometry(.12,.12,.45),
-        new THREE.MeshStandardMaterial({
-            color:0x221100
-        })
-    );
-
-    handle.position.set(.45,-.3,.1);
-    group.add(handle);
-
-    return group;
-}
-
-function createChainsaw(){
-
-    return createGun({
-        color:0x333333
+        life: 100
     });
 }
 
-function createGrappler(){
+let shootCooldown = 0;
 
-    return createGun({
-        color:0x777777
-    });
+/* =========================
+   COLLISION
+========================= */
+
+function overlap(a, b) {
+
+    return (
+        a.x < b.x + b.w &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.height > b.y
+    );
 }
 
-function createMedkit(){
+/*
+    IMPORTANT:
+    The floor is ALWAYS solid.
 
-    const group=new THREE.Group();
+    This prevents the player from falling
+    underneath the map.
+*/
 
-    const box=new THREE.Mesh(
-        new THREE.BoxGeometry(.5,.3,.7),
-        new THREE.MeshStandardMaterial({
-            color:0xffffff
-        })
-    );
+function resolvePlayerCollision() {
 
-    box.position.set(.35,-.3,-.5);
-
-    group.add(box);
-
-    return group;
-}
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-function init(){
-
-    scene=new THREE.Scene();
-
-    scene.background=new THREE.Color(0x090914);
-
-    scene.fog=new THREE.FogExp2(
-        0x090914,
-        .018
-    );
-
-    camera=new THREE.PerspectiveCamera(
-        75,
-        innerWidth/innerHeight,
-        .1,
-        1000
-    );
-
-    /*
-     * Player eye height.
-     * PointerLockControls uses this position
-     * as the player's position.
-     */
-
-    camera.position.set(0,0,8);
-
-    renderer=new THREE.WebGLRenderer({
-        antialias:true
-    });
-
-    renderer.setSize(
-        innerWidth,
-        innerHeight
-    );
-
-    renderer.shadowMap.enabled=true;
-
-    document.body.appendChild(
-        renderer.domElement
-    );
-
-    controls=new THREE.PointerLockControls(
-        camera,
-        document.body
-    );
-
-    scene.add(camera);
-
-
-    /* LIGHT */
-
-    scene.add(
-        new THREE.AmbientLight(
-            0x666688,
-            1
-        )
-    );
-
-    const light=new THREE.DirectionalLight(
-        0xffffff,
-        1.4
-    );
-
-    light.position.set(
-        20,40,20
-    );
-
-    light.castShadow=true;
-
-    scene.add(light);
-
+    player.grounded = false;
 
     /* FLOOR */
 
-    const floor=new THREE.Mesh(
-        new THREE.PlaneGeometry(
-            160,
-            160
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x171722
-        })
-    );
+    if (player.y + player.height >= world.floor) {
 
-    floor.rotation.x=-Math.PI/2;
-
-    floor.receiveShadow=true;
-
-    scene.add(floor);
-
-
-    /* GRID */
-
-    scene.add(
-        new THREE.GridHelper(
-            160,
-            80,
-            0x00aaff,
-            0x222244
-        )
-    );
-
-
-    /* WALLS */
-
-    createWall(0,4,-45,90,2);
-    createWall(0,4,45,90,2);
-    createWall(-45,4,0,2,90);
-    createWall(45,4,0,2,90);
-
-
-    /* =====================================================
-       COVER BOXES
-    ===================================================== */
-
-    for(let i=0;i<25;i++){
-
-        const width=4;
-        const height=3;
-        const depth=4;
-
-        const box=new THREE.Mesh(
-            new THREE.BoxGeometry(
-                width,
-                height,
-                depth
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x303044
-            })
-        );
-
-        box.position.set(
-            (Math.random()-.5)*70,
-            height/2,
-            (Math.random()-.5)*70
-        );
-
-        box.castShadow=true;
-        box.receiveShadow=true;
-
-        scene.add(box);
-
-        /*
-         * Save box information for collision.
-         */
-
-        coverBoxes.push({
-            mesh:box,
-            halfX:width/2,
-            halfY:height/2,
-            halfZ:depth/2
-        });
-
+        player.y = world.floor - player.height;
+        player.vy = 0;
+        player.grounded = true;
     }
 
+    /* BOXES */
+
+    for (const box of boxes) {
+
+        const playerBottom =
+            player.y + player.height;
+
+        const playerPreviousBottom =
+            playerBottom - player.vy;
+
+        const horizontal =
+            player.x + player.width > box.x &&
+            player.x < box.x + box.w;
+
+        /*
+            Landing on top of box
+        */
+
+        if (
+            horizontal &&
+            playerPreviousBottom <= box.y &&
+            playerBottom >= box.y &&
+            player.vy >= 0
+        ) {
+
+            player.y = box.y - player.height;
+            player.vy = 0;
+            player.grounded = true;
+        }
+
+        /*
+            Hit underside of box
+        */
+
+        if (
+            horizontal &&
+            player.y < box.y + box.h &&
+            playerBottom > box.y + box.h &&
+            player.vy < 0
+        ) {
+
+            player.y = box.y + box.h;
+            player.vy = 0;
+        }
+    }
+
+    /* HARD WORLD LIMIT */
+
+    if (player.y < 0) {
+        player.y = 0;
+        player.vy = 0;
+    }
+}
+
+/* =========================
+   ZOMBIE COLLISION
+========================= */
+
+function resolveZombieCollision(z) {
+
+    z.grounded = false;
+
+    /* FLOOR */
+
+    if (z.y + z.height >= world.floor) {
+
+        z.y = world.floor - z.height;
+        z.vy = 0;
+        z.grounded = true;
+    }
+
+    /* BOXES */
+
+    for (const box of boxes) {
+
+        const bottom = z.y + z.height;
+        const previousBottom = bottom - z.vy;
+
+        const horizontal =
+            z.x + z.width > box.x &&
+            z.x < box.x + box.w;
+
+        if (
+            horizontal &&
+            previousBottom <= box.y &&
+            bottom >= box.y &&
+            z.vy >= 0
+        ) {
+
+            z.y = box.y - z.height;
+            z.vy = 0;
+            z.grounded = true;
+        }
+    }
+}
+
+/* =========================
+   CAMERA
+========================= */
+
+const camera = {
+    x: 0,
+    y: 0
+};
+
+/* =========================
+   UPDATE PLAYER
+========================= */
+
+function updatePlayer() {
+
+    let move = 0;
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    ) {
+        move -= 1;
+    }
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    ) {
+        move += 1;
+    }
+
+    player.vx = move * player.speed;
+
+    if (move !== 0) {
+        player.facing = move;
+    }
+
+    player.x += player.vx;
+
+    /* WORLD WALLS */
+
+    if (player.x < 0) {
+        player.x = 0;
+    }
+
+    if (
+        player.x + player.width >
+        world.width
+    ) {
+        player.x =
+            world.width - player.width;
+    }
+
+    /* GRAVITY */
+
+    player.vy += 0.6;
+
+    player.y += player.vy;
+
+    resolvePlayerCollision();
+
+    /* CAMERA */
+
+    camera.x =
+        player.x -
+        canvas.width / 2 +
+        player.width / 2;
+
+    camera.y =
+        player.y -
+        canvas.height / 2;
+
+    camera.x =
+        Math.max(
+            0,
+            Math.min(
+                camera.x,
+                world.width - canvas.width
+            )
+        );
+
+    camera.y =
+        Math.max(
+            0,
+            Math.min(
+                camera.y,
+                560 - canvas.height
+            )
+        );
+}
+
+/* =========================
+   UPDATE ZOMBIES
+========================= */
+
+function updateZombies() {
+
+    for (let i = zombies.length - 1; i >= 0; i--) {
+
+        const z = zombies[i];
+
+        const dx =
+            player.x - z.x;
+
+        /*
+            Zombies chase player.
+        */
+
+        if (Math.abs(dx) > 10) {
+
+            z.vx =
+                Math.sign(dx) *
+                z.speed;
+        }
+        else {
+
+            z.vx = 0;
+        }
+
+        /*
+            Zombies can jump onto boxes.
+        */
+
+        if (
+            z.grounded &&
+            Math.abs(dx) < 250
+        ) {
+
+            const boxAhead = boxes.some(box => {
+
+                return (
+                    z.x + z.width > box.x &&
+                    z.x < box.x + box.w &&
+                    Math.abs(
+                        (z.y + z.height) - box.y
+                    ) < 20
+                );
+            });
+
+            if (boxAhead) {
+                z.vy = -11;
+                z.grounded = false;
+            }
+        }
+
+        z.x += z.vx;
+
+        z.vy += 0.6;
+        z.y += z.vy;
+
+        resolveZombieCollision(z);
+
+        /* ZOMBIE ATTACK */
+
+        if (
+            z.attackCooldown > 0
+        ) {
+            z.attackCooldown--;
+        }
+
+        if (
+            overlap(
+                player,
+                {
+                    x: z.x,
+                    y: z.y,
+                    w: z.width,
+                    h: z.height
+                }
+            )
+            &&
+            z.attackCooldown <= 0
+        ) {
+
+            player.health -= 10;
+
+            z.attackCooldown = 45;
+
+            if (player.health <= 0) {
+
+                player.health = 0;
+
+                document.getElementById(
+                    "gameOver"
+                ).style.display = "flex";
+            }
+        }
+    }
+}
+
+/* =========================
+   UPDATE BULLETS
+========================= */
+
+function updateBullets() {
+
+    for (
+        let i = bullets.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const b = bullets[i];
+
+        b.x += b.vx;
+        b.y += b.vy;
+
+        b.life--;
+
+        let remove = false;
+
+        /* BOX COLLISION */
+
+        for (const box of boxes) {
+
+            if (
+                b.x > box.x &&
+                b.x < box.x + box.w &&
+                b.y > box.y &&
+                b.y < box.y + box.h
+            ) {
+
+                remove = true;
+                break;
+            }
+        }
+
+        /* ZOMBIE COLLISION */
+
+        for (
+            let j = zombies.length - 1;
+            j >= 0;
+            j--
+        ) {
+
+            const z = zombies[j];
+
+            if (
+                b.x > z.x &&
+                b.x < z.x + z.width &&
+                b.y > z.y &&
+                b.y < z.y + z.height
+            ) {
+
+                z.health -= 50;
+
+                remove = true;
+
+                if (z.health <= 0) {
+                    zombies.splice(j, 1);
+                }
+
+                break;
+            }
+        }
+
+        if (
+            b.life <= 0 ||
+            b.x < 0 ||
+            b.x > world.width
+        ) {
+            remove = true;
+        }
+
+        if (remove) {
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+/* =========================
+   DRAW WORLD
+========================= */
+
+function drawWorld() {
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+    /* BACKGROUND */
+
+    ctx.fillStyle = "#10121a";
+
+    ctx.fillRect(
+        0,
+        0,
+        world.width,
+        560
+    );
+
+    /* CEILING */
+
+    ctx.fillStyle = "#20232d";
+
+    ctx.fillRect(
+        0,
+        0,
+        world.width,
+        40
+    );
+
+    /* WALL DETAILS */
+
+    for (
+        let x = 0;
+        x < world.width;
+        x += 100
+    ) {
+
+        ctx.strokeStyle = "#292c37";
+
+        ctx.beginPath();
+
+        ctx.moveTo(x, 40);
+        ctx.lineTo(x + 20, 560);
+
+        ctx.stroke();
+    }
+
+    /* FLOOR */
+
+    ctx.fillStyle = "#29221d";
+
+    ctx.fillRect(
+        0,
+        world.floor,
+        world.width,
+        100
+    );
+
+    /* FLOOR LINE */
+
+    ctx.fillStyle = "#55504a";
+
+    ctx.fillRect(
+        0,
+        world.floor,
+        world.width,
+        5
+    );
+
+    /* BOXES */
+
+    for (const box of boxes) {
+
+        ctx.fillStyle = "#80542d";
+
+        ctx.fillRect(
+            box.x,
+            box.y,
+            box.w,
+            box.h
+        );
+
+        ctx.strokeStyle = "#c28a4c";
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            box.x,
+            box.y,
+            box.w,
+            box.h
+        );
+
+        /* X MARK */
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            box.x + 10,
+            box.y + 10
+        );
+
+        ctx.lineTo(
+            box.x + box.w - 10,
+            box.y + box.h - 10
+        );
+
+        ctx.moveTo(
+            box.x + box.w - 10,
+            box.y + 10
+        );
+
+        ctx.lineTo(
+            box.x + 10,
+            box.y + box.h - 10
+        );
+
+        ctx.stroke();
+    }
+
+    /* PLAYER */
+
+    drawPlayer();
 
     /* ZOMBIES */
 
-    for(let i=0;i<15;i++){
-
-        spawnZombie();
-
-    }
-
-
-    updateCurrentWeapon();
-
-
-    /* KEYBOARD */
-
-    window.addEventListener(
-        "keydown",
-        handleKeyDown
-    );
-
-    window.addEventListener(
-        "keyup",
-        e=>{
-            keys[e.code]=false;
-        }
-    );
-
-
-    /* MOUSE */
-
-    window.addEventListener(
-        "mousedown",
-        e=>{
-
-            if(
-                e.button===0 &&
-                controls.isLocked
-            ){
-
-                shooting=true;
-
-            }
-
-        }
-    );
-
-    window.addEventListener(
-        "mouseup",
-        e=>{
-
-            if(e.button===0)
-                shooting=false;
-
-        }
-    );
-
-
-    window.addEventListener(
-        "resize",
-        resize
-    );
-
-
-    document.getElementById(
-        "startButton"
-    ).onclick=()=>{
-
-        document.getElementById(
-            "startScreen"
-        ).style.display="none";
-
-        gameStarted=true;
-
-        controls.lock();
-
-    };
-
-
-    document.getElementById(
-        "closeInventory"
-    ).onclick=closeInventory;
-
-
-    buildInventory();
-
-}
-
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-function handleKeyDown(e){
-
-    keys[e.code]=true;
-
-
-    if(
-        e.code==="ArrowUp" ||
-        e.code==="ArrowDown" ||
-        e.code==="ArrowLeft" ||
-        e.code==="ArrowRight"
-    ){
-
-        e.preventDefault();
-
-    }
-
-
-    /* JUMP */
-
-    if(e.code==="Space"){
-
-        e.preventDefault();
-
-        if(
-            controls.isLocked &&
-            onGround &&
-            !sliding &&
-            !gameOver
-        ){
-
-            verticalVelocity=jumpPower;
-
-            onGround=false;
-
-            const jumpText=
-                document.getElementById(
-                    "jumpText"
-                );
-
-            jumpText.style.opacity=1;
-
-            setTimeout(
-                ()=>{
-                    jumpText.style.opacity=0;
-                },
-                250
-            );
-
-        }
-
-    }
-
-
-    if(e.code==="Digit1")
-        selectSlot(1);
-
-    if(e.code==="Digit2")
-        selectSlot(2);
-
-    if(e.code==="Digit3")
-        selectSlot(3);
-
-    if(e.code==="Digit4")
-        selectSlot(4);
-
-
-    if(e.code==="KeyC"){
-
-        if(
-            !sliding &&
-            controls.isLocked
-        ){
-
-            startSlide();
-
-        }
-
-    }
-
-
-    if(e.code==="Backquote"){
-
-        toggleInventory();
-
-    }
-
-}
-
-
-/* =========================================================
-   INVENTORY
-========================================================= */
-
-function toggleInventory(){
-
-    const inventory=
-        document.getElementById(
-            "inventory"
+    for (const z of zombies) {
+
+        ctx.fillStyle = "#55a63b";
+
+        ctx.fillRect(
+            z.x,
+            z.y,
+            z.width,
+            z.height
         );
 
-    if(
-        inventory.style.display==="block"
-    ){
-
-        closeInventory();
-
-    }
-    else{
-
-        openInventory();
-
-    }
-}
-
-function openInventory(){
-
-    shooting=false;
-
-    document.getElementById(
-        "inventory"
-    ).style.display="block";
-
-    if(controls.isLocked)
-        controls.unlock();
-}
-
-function closeInventory(){
-
-    document.getElementById(
-        "inventory"
-    ).style.display="none";
-
-    if(
-        gameStarted &&
-        !gameOver
-    ){
-
-        controls.lock();
-
-    }
-}
-
-function selectSlot(slot){
-
-    currentSlot=slot;
-
-    updateCurrentWeapon();
-
-}
-
-
-/* =========================================================
-   WALL
-========================================================= */
-
-function createWall(
-    x,y,z,w,d
-){
-
-    const wall=new THREE.Mesh(
-        new THREE.BoxGeometry(
-            w,
-            8,
-            d
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x252538
-        })
-    );
-
-    wall.position.set(
-        x,y,z
-    );
-
-    scene.add(wall);
-}
-
-
-/* =========================================================
-   ZOMBIE
-========================================================= */
-
-function spawnZombie(){
-
-    const zombie=new THREE.Group();
-
-
-    const body=new THREE.Mesh(
-        new THREE.BoxGeometry(
-            1.1,
-            1.4,
-            .7
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x4caa4c
-        })
-    );
-
-    body.position.y=1.4;
-
-    zombie.add(body);
-
-
-    const head=new THREE.Mesh(
-        new THREE.BoxGeometry(
-            .8,
-            .8,
-            .8
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x72c957
-        })
-    );
-
-    head.position.y=2.5;
-
-    zombie.add(head);
-
-
-    const armGeo=new THREE.BoxGeometry(
-        .3,
-        1.2,
-        .3
-    );
-
-
-    const arm1=new THREE.Mesh(
-        armGeo,
-        new THREE.MeshStandardMaterial({
-            color:0x72c957
-        })
-    );
-
-    arm1.position.set(
-        -.7,
-        1.5,
-        0
-    );
-
-    zombie.add(arm1);
-
-
-    const arm2=arm1.clone();
-
-    arm2.position.x=.7;
-
-    zombie.add(arm2);
-
-
-    const angle=
-        Math.random()*Math.PI*2;
-
-    const distance=
-        25+Math.random()*25;
-
-
-    zombie.position.set(
-        Math.cos(angle)*distance,
-        0,
-        Math.sin(angle)*distance
-    );
-
-
-    zombie.userData={
-        hp:100,
-        speed:.035+Math.random()*.025,
-        attackCooldown:0,
-        radius:1.2
-    };
-
-
-    scene.add(zombie);
-
-    zombies.push(zombie);
-}
-
-
-/* =========================================================
-   PLAYER MOVEMENT
-========================================================= */
-
-function updateMovement(){
-
-    if(
-        !controls.isLocked ||
-        gameOver
-    )
-        return;
-
-
-    const player=
-        controls.getObject().position;
-
-
-    /* =====================================================
-       HORIZONTAL MOVEMENT
-    ===================================================== */
-
-    if(sliding){
-
-        camera.position.add(
-            slideDirection
+        /* HEAD */
+
+        ctx.fillStyle = "#7fc45a";
+
+        ctx.fillRect(
+            z.x + 4,
+            z.y - 20,
+            27,
+            25
         );
 
-        slideTimer--;
-
-        if(slideTimer<=0){
-
-            sliding=false;
-
-            /*
-             * Do not change Y here.
-             * Jumping/box collision controls Y.
-             */
-
-            document.getElementById(
-                "slideText"
-            ).style.opacity=0;
-
-        }
-
-    }
-    else{
-
-        const speed=.13;
-
-        if(keys.ArrowUp)
-            controls.moveForward(speed);
-
-        if(keys.ArrowDown)
-            controls.moveForward(-speed);
-
-        if(keys.ArrowLeft)
-            controls.moveRight(-speed);
-
-        if(keys.ArrowRight)
-            controls.moveRight(speed);
-
-    }
-
-
-    /* =====================================================
-       GRAVITY
-    ===================================================== */
-
-    verticalVelocity-=gravity;
-
-    player.y+=verticalVelocity;
-
-
-    /* =====================================================
-       FLOOR
-    ===================================================== */
-
-    if(player.y<=0){
-
-        player.y=0;
-
-        verticalVelocity=0;
-
-        onGround=true;
-
-    }
-
-
-    /* =====================================================
-       BOX COLLISION
-    ===================================================== */
-
-    coverBoxes.forEach(boxData=>{
-
-        const box=boxData.mesh;
-
-        const halfX=boxData.halfX;
-        const halfZ=boxData.halfZ;
-
-        const boxBottom=
-            box.position.y-boxData.halfY;
-
-        const boxTop=
-            box.position.y+boxData.halfY;
-
-
-        /*
-         * Find the closest point on the box
-         * to the player.
-         */
-
-        const closestX=
-            Math.max(
-                box.position.x-halfX,
-                Math.min(
-                    player.x,
-                    box.position.x+halfX
-                )
-            );
-
-        const closestZ=
-            Math.max(
-                box.position.z-halfZ,
-                Math.min(
-                    player.z,
-                    box.position.z+halfZ
-                )
-            );
-
-
-        const dx=
-            player.x-closestX;
-
-        const dz=
-            player.z-closestZ;
-
-        const horizontalDistance=
-            Math.sqrt(
-                dx*dx+
-                dz*dz
-            );
-
-
-        /* =================================================
-           LAND ON TOP OF BOX
-        ================================================= */
-
-        if(
-            horizontalDistance<=playerRadius &&
-            verticalVelocity<=0 &&
-            player.y>=boxTop-.45 &&
-            player.y<=boxTop+.5
-        ){
-
-            player.y=boxTop;
-
-            verticalVelocity=0;
-
-            onGround=true;
-
-        }
-
-
-        /* =================================================
-           BOX SIDE COLLISION
-        ================================================= */
-
-        else if(
-            horizontalDistance<playerRadius &&
-            player.y<boxTop-.45 &&
-            player.y>boxBottom
-        ){
-
-            if(
-                Math.abs(dx)>
-                Math.abs(dz)
-            ){
-
-                if(dx>0){
-
-                    player.x=
-                        box.position.x+
-                        halfX+
-                        playerRadius;
-
-                }
-                else{
-
-                    player.x=
-                        box.position.x-
-                        halfX-
-                        playerRadius;
-
-                }
-
-            }
-            else{
-
-                if(dz>0){
-
-                    player.z=
-                        box.position.z+
-                        halfZ+
-                        playerRadius;
-
-                }
-                else{
-
-                    player.z=
-                        box.position.z-
-                        halfZ-
-                        playerRadius;
-
-                }
-
-            }
-
-        }
-
-    });
-
-
-    /* =====================================================
-       ARENA BOUNDS
-    ===================================================== */
-
-    player.x=
-        Math.max(
-            -42,
-            Math.min(
-                42,
-                player.x
-            )
+        /* EYES */
+
+        ctx.fillStyle = "red";
+
+        ctx.fillRect(
+            z.x + 9,
+            z.y - 12,
+            5,
+            5
         );
 
-    player.z=
-        Math.max(
-            -42,
-            Math.min(
-                42,
-                player.z
-            )
+        ctx.fillRect(
+            z.x + 21,
+            z.y - 12,
+            5,
+            5
         );
 
+        /* HEALTH BAR */
 
-    /* =====================================================
-       ZOMBIE COLLISION
-    ===================================================== */
+        ctx.fillStyle = "#222";
 
-    zombies.forEach(zombie=>{
+        ctx.fillRect(
+            z.x,
+            z.y - 28,
+            z.width,
+            5
+        );
 
-        const dx=
-            player.x-
-            zombie.position.x;
+        ctx.fillStyle = "#e33";
 
-        const dz=
-            player.z-
-            zombie.position.z;
+        ctx.fillRect(
+            z.x,
+            z.y - 28,
+            z.width *
+            (z.health / 100),
+            5
+        );
+    }
 
-        const distance=
-            Math.sqrt(
-                dx*dx+
-                dz*dz
-            );
+    /* BULLETS */
 
-        const minimum=1.55;
+    for (const b of bullets) {
 
+        ctx.fillStyle = "#ffd34d";
 
-        /*
-         * If you're standing above a zombie,
-         * don't let the zombie push you around.
-         */
+        ctx.beginPath();
 
-        if(
-            distance<minimum &&
-            player.y<1.5
-        ){
-
-            if(distance<.001){
-
-                player.x+=minimum;
-
-            }
-            else{
-
-                player.x=
-                    zombie.position.x+
-                    dx/distance*minimum;
-
-                player.z=
-                    zombie.position.z+
-                    dz/distance*minimum;
-
-            }
-
-        }
-
-    });
-
-}
-
-
-/* =========================================================
-   SLIDE
-========================================================= */
-
-function startSlide(){
-
-    if(!onGround)
-        return;
-
-    sliding=true;
-
-    slideTimer=25;
-
-    camera.position.y=-.85;
-
-
-    camera.getWorldDirection(
-        slideDirection
-    );
-
-    slideDirection.y=0;
-
-
-    if(
-        slideDirection.lengthSq()<.001
-    ){
-
-        slideDirection.set(
+        ctx.arc(
+            b.x,
+            b.y,
+            4,
             0,
-            0,
-            -1
+            Math.PI * 2
         );
 
+        ctx.fill();
     }
 
-
-    slideDirection.normalize();
-
-    slideDirection.multiplyScalar(.42);
-
-
-    document.getElementById(
-        "slideText"
-    ).style.opacity=1;
+    ctx.restore();
 }
 
+/* =========================
+   PLAYER DRAW
+========================= */
 
-/* =========================================================
+function drawPlayer() {
+
+    /* BODY */
+
+    ctx.fillStyle = "#3b6cff";
+
+    ctx.fillRect(
+        player.x,
+        player.y,
+        player.width,
+        player.height
+    );
+
+    /* HEAD */
+
+    ctx.fillStyle = "#e0ad7c";
+
+    ctx.fillRect(
+        player.x + 4,
+        player.y - 22,
+        25,
+        25
+    );
+
+    /* HAIR */
+
+    ctx.fillStyle = "#222";
+
+    ctx.fillRect(
+        player.x + 3,
+        player.y - 25,
+        27,
+        9
+    );
+
+    /* GUN */
+
+    ctx.fillStyle = "#444";
+
+    if (player.facing > 0) {
+
+        ctx.fillRect(
+            player.x + 28,
+            player.y + 20,
+            25,
+            8
+        );
+
+    } else {
+
+        ctx.fillRect(
+            player.x - 25,
+            player.y + 20,
+            25,
+            8
+        );
+    }
+}
+
+/* =========================
    SHOOTING
-========================================================= */
+========================= */
 
-function shoot(){
+function updateShooting() {
 
-    const weapon=getCurrentWeapon();
-
-    const now=performance.now();
-
-    if(
-        now-lastShot<
-        weapon.fireRate
-    )
-        return;
-
-    lastShot=now;
-
-
-    /* MELEE */
-
-    if(
-        weapon.type==="melee" ||
-        weapon.type==="chainsaw"
-    ){
-
-        meleeAttack(weapon);
-
-        return;
-
+    if (shootCooldown > 0) {
+        shootCooldown--;
     }
 
+    if (
+        mouse.down &&
+        shootCooldown <= 0
+    ) {
 
-    /* MEDKIT */
+        shoot();
 
-    if(weapon.type==="medkit"){
-
-        playerHP=
-            Math.min(
-                100,
-                playerHP+40
-            );
-
-        updateHUD();
-
-        return;
-
+        shootCooldown = 12;
     }
-
-
-    /* GRAPPLER */
-
-    if(weapon.type==="grappler"){
-
-        const dir=getDirection();
-
-        camera.position.addScaledVector(
-            dir,
-            10
-        );
-
-        return;
-
-    }
-
-
-    let count=1;
-
-    if(weapon.type==="shotgun")
-        count=8;
-
-    if(weapon.type==="dual")
-        count=2;
-
-
-    for(let i=0;i<count;i++){
-
-        const dir=getDirection();
-
-
-        if(count>1){
-
-            dir.x+=
-                (Math.random()-.5)*.18;
-
-            dir.y+=
-                (Math.random()-.5)*.18;
-
-            dir.z+=
-                (Math.random()-.5)*.18;
-
-            dir.normalize();
-
-        }
-
-
-        bullets.push({
-
-            position:
-                camera.position.clone(),
-
-            direction:dir,
-
-            speed:weapon.speed,
-
-            damage:weapon.damage,
-
-            type:weapon.type,
-
-            color:
-                weapon.bulletColor ||
-                0xffff00,
-
-            life:100
-
-        });
-
-    }
-
 }
 
-
-/* =========================================================
-   DIRECTION
-========================================================= */
-
-function getDirection(){
-
-    const direction=
-        new THREE.Vector3();
-
-    camera.getWorldDirection(
-        direction
-    );
-
-    return direction;
-}
-
-
-/* =========================================================
-   MELEE
-========================================================= */
-
-function meleeAttack(weapon){
-
-    const player=
-        controls.getObject().position;
-
-    const direction=
-        getDirection();
-
-
-    zombies.slice().forEach(
-        zombie=>{
-
-            const toZombie=
-                zombie.position.clone()
-                .sub(player);
-
-            const distance=
-                toZombie.length();
-
-
-            if(
-                distance>
-                weapon.range
-            )
-                return;
-
-
-            toZombie.normalize();
-
-
-            if(
-                direction.dot(
-                    toZombie
-                )>.35
-            ){
-
-                damageZombie(
-                    zombie,
-                    weapon.damage
-                );
-
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   BULLETS
-========================================================= */
-
-function updateBullets(){
-
-    for(
-        let i=bullets.length-1;
-        i>=0;
-        i--
-    ){
-
-        const bullet=bullets[i];
-
-        bullet.position.addScaledVector(
-            bullet.direction,
-            bullet.speed
-        );
-
-        bullet.life--;
-
-        let hit=false;
-
-
-        for(
-            const zombie of zombies
-        ){
-
-            const distance=
-                zombie.position.distanceTo(
-                    bullet.position
-                );
-
-
-            if(
-                distance<1.35
-            ){
-
-                if(
-                    bullet.type==="rpg" ||
-                    bullet.type==="grenade" ||
-                    bullet.type==="grenadelauncher" ||
-                    bullet.type==="molotov"
-                ){
-
-                    createExplosion(
-                        bullet.position,
-                        bullet.damage
-                    );
-
-                }
-                else{
-
-                    damageZombie(
-                        zombie,
-                        bullet.damage
-                    );
-
-                }
-
-
-                hit=true;
-
-                break;
-
-            }
-
-        }
-
-
-        if(
-            hit ||
-            bullet.life<=0
-        ){
-
-            bullets.splice(
-                i,
-                1
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   ZOMBIE DAMAGE
-========================================================= */
-
-function damageZombie(
-    zombie,
-    damage
-){
-
-    zombie.userData.hp-=damage;
-
-
-    if(
-        zombie.userData.hp<=0
-    ){
-
-        scene.remove(zombie);
-
-
-        const index=
-            zombies.indexOf(zombie);
-
-
-        if(index!==-1)
-            zombies.splice(
-                index,
-                1
-            );
-
-
-        score+=100;
-
-        xp+=20;
-
-
-        if(xp>=100){
-
-            xp-=100;
-
-            level++;
-
-        }
-
-
-        spawnZombie();
-
-        updateHUD();
-
-    }
-
-}
-
-
-/* =========================================================
-   EXPLOSION
-========================================================= */
-
-function createExplosion(
-    position,
-    damage
-){
-
-    zombies.slice().forEach(
-        zombie=>{
-
-            const distance=
-                zombie.position.distanceTo(
-                    position
-                );
-
-
-            if(distance<7){
-
-                const multiplier=
-                    1-distance/7;
-
-                damageZombie(
-                    zombie,
-                    damage*multiplier
-                );
-
-            }
-
-        }
-    );
-
-
-    const geometry=
-        new THREE.SphereGeometry(
-            .5,
-            16,
-            16
-        );
-
-
-    const material=
-        new THREE.MeshBasicMaterial({
-            color:0xff4400,
-            transparent:true,
-            opacity:.8
-        });
-
-
-    const mesh=
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
-
-    mesh.position.copy(
-        position
-    );
-
-
-    scene.add(mesh);
-
-
-    explosions.push({
-        mesh:mesh,
-        life:20
-    });
-
-}
-
-
-/* =========================================================
-   ZOMBIE AI
-========================================================= */
-
-function updateZombies(){
-
-    const player=
-        controls.getObject().position;
-
-
-    zombies.forEach(
-        zombie=>{
-
-            const direction=
-                player.clone()
-                .sub(zombie.position);
-
-
-            direction.y=0;
-
-
-            const distance=
-                direction.length();
-
-
-            const stopDistance=1.45;
-
-
-            /*
-             * Zombies follow horizontally.
-             */
-
-            if(
-                distance>
-                stopDistance
-            ){
-
-                direction.normalize();
-
-                zombie.position.addScaledVector(
-                    direction,
-                    zombie.userData.speed
-                );
-
-            }
-
-
-            zombie.lookAt(
-                player.x,
-                zombie.position.y,
-                player.z
-            );
-
-
-            /*
-             * ZOMBIE ATTACK
-             */
-
-            if(
-                distance<2.0 &&
-                player.y<1.5
-            ){
-
-                zombie.userData.attackCooldown--;
-
-
-                if(
-                    zombie.userData.attackCooldown<=0
-                ){
-
-                    playerHP-=10;
-
-                    zombie.userData.attackCooldown=50;
-
-                    flashDamage();
-
-                    updateHUD();
-
-
-                    if(
-                        playerHP<=0
-                    ){
-
-                        endGame();
-
-                    }
-
-                }
-
-            }
-            else{
-
-                zombie.userData.attackCooldown=0;
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   DAMAGE FLASH
-========================================================= */
-
-function flashDamage(){
-
-    const flash=
-        document.getElementById(
-            "damageFlash"
-        );
-
-    flash.style.opacity=.8;
-
-    setTimeout(
-        ()=>{
-            flash.style.opacity=0;
-        },
-        100
-    );
-}
-
-
-/* =========================================================
-   GAME OVER
-========================================================= */
-
-function endGame(){
-
-    gameOver=true;
-
-    shooting=false;
-
-    controls.unlock();
-
+/* =========================
+   HUD
+========================= */
+
+function updateHUD() {
 
     document.getElementById(
-        "finalScore"
-    ).textContent=
-        score;
-
-
-    document.getElementById(
-        "gameOver"
-    ).style.display=
-        "flex";
-
-}
-
-
-/* =========================================================
-   DRAW BULLETS
-========================================================= */
-
-function drawBullets(){
-
-    scene.children
-        .filter(
-            x=>
-                x.userData &&
-                x.userData.visualBullet
-        )
-        .forEach(
-            x=>scene.remove(x)
+        "health"
+    ).textContent =
+        Math.max(
+            0,
+            Math.floor(player.health)
         );
 
+    document.getElementById(
+        "ammo"
+    ).textContent =
+        player.ammo;
 
-    bullets.forEach(
-        bullet=>{
-
-            const geometry=
-                new THREE.SphereGeometry(
-                    .09,
-                    8,
-                    8
-                );
-
-
-            const material=
-                new THREE.MeshBasicMaterial({
-                    color:bullet.color
-                });
-
-
-            const mesh=
-                new THREE.Mesh(
-                    geometry,
-                    material
-                );
-
-
-            mesh.position.copy(
-                bullet.position
-            );
-
-
-            mesh.userData.visualBullet=true;
-
-
-            scene.add(mesh);
-
-        }
-    );
-
+    document.getElementById(
+        "zombies"
+    ).textContent =
+        zombies.length;
 }
 
-
-/* =========================================================
-   EXPLOSIONS
-========================================================= */
-
-function updateExplosions(){
-
-    for(
-        let i=explosions.length-1;
-        i>=0;
-        i--
-    ){
-
-        const explosion=
-            explosions[i];
-
-
-        explosion.mesh.scale
-            .multiplyScalar(1.15);
-
-
-        explosion.mesh.material.opacity
-            *=.9;
-
-
-        explosion.life--;
-
-
-        if(
-            explosion.life<=0
-        ){
-
-            scene.remove(
-                explosion.mesh
-            );
-
-
-            explosions.splice(
-                i,
-                1
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-function resize(){
-
-    camera.aspect=
-        innerWidth/innerHeight;
-
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(
-        innerWidth,
-        innerHeight
-    );
-}
-
-
-/* =========================================================
+/* =========================
    GAME LOOP
-========================================================= */
+========================= */
 
-function animate(){
+function gameLoop() {
+
+    updatePlayer();
+
+    updateZombies();
+
+    updateBullets();
+
+    updateShooting();
+
+    updateHUD();
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    drawWorld();
 
     requestAnimationFrame(
-        animate
-    );
-
-
-    if(
-        gameStarted &&
-        !gameOver
-    ){
-
-        updateMovement();
-
-
-        if(
-            shooting &&
-            controls.isLocked
-        ){
-
-            shoot();
-
-        }
-
-
-        updateBullets();
-
-        updateZombies();
-
-        updateExplosions();
-
-        drawBullets();
-
-    }
-
-
-    renderer.render(
-        scene,
-        camera
+        gameLoop
     );
 }
 
-
-/* =========================================================
-   START
-========================================================= */
-
-init();
-
-updateHUD();
-
-animate();
+gameLoop();
 
 </script>
 
 </body>
 </html>
-```
