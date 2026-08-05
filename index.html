@@ -1,8 +1,12 @@
+```html
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta name="google-site-verification" content="KymRAgiQ3To-fdJ_7XduwY8VjBn8gHIoZD6cQEq6R6A" />
-    <title>Rival Zombie Arena</title>
-    <style>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="google-site-verification" content="KymRAgiQ3To-fdJ_7XduwY8VjBn8gHIoZD6cQEq6R6A">
+<title>Rival Zombie Arena</title>
+
+<style>
 body{
     margin:0;
     overflow:hidden;
@@ -11,11 +15,7 @@ body{
     color:white;
 }
 
-canvas{
-    display:block;
-}
-
-/* HUD */
+canvas{display:block}
 
 #hud{
     position:fixed;
@@ -51,8 +51,6 @@ canvas{
     font-weight:bold;
 }
 
-/* CROSSHAIR */
-
 #crosshair{
     position:fixed;
     left:50%;
@@ -85,8 +83,6 @@ canvas{
     top:0;
 }
 
-/* WEAPON BAR */
-
 #weaponBar{
     position:fixed;
     bottom:15px;
@@ -118,8 +114,6 @@ canvas{
     display:block;
     font-size:13px;
 }
-
-/* INVENTORY */
 
 #inventory{
     display:none;
@@ -184,9 +178,7 @@ canvas{
     background:#202040;
 }
 
-.weaponButton small{
-    color:#aaa;
-}
+.weaponButton small{color:#aaa}
 
 #closeInventory{
     position:fixed;
@@ -200,8 +192,6 @@ canvas{
     cursor:pointer;
 }
 
-/* START */
-
 #startScreen,
 #gameOver{
     position:fixed;
@@ -213,9 +203,7 @@ canvas{
     background:rgba(3,3,10,.96);
 }
 
-#gameOver{
-    display:none;
-}
+#gameOver{display:none}
 
 .panel{
     max-width:650px;
@@ -236,8 +224,6 @@ button{
     cursor:pointer;
 }
 
-/* HIT FLASH */
-
 #damageFlash{
     position:fixed;
     inset:0;
@@ -246,8 +232,6 @@ button{
     pointer-events:none;
     z-index:50;
 }
-
-/* SLIDE */
 
 #slideText{
     position:fixed;
@@ -259,50 +243,41 @@ button{
     opacity:0;
     z-index:40;
 }
+
+#jumpText{
+    position:fixed;
+    bottom:120px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#fff;
+    font-weight:bold;
+    opacity:0;
+    z-index:40;
+}
 </style>
 </head>
 
 <body>
 
 <div id="hud">
-
-    <div>
-        HP:
-        <span id="hpText">100</span>/100
-    </div>
+    <div>HP: <span id="hpText">100</span>/100</div>
 
     <div class="hpbar">
         <div id="hpbar"></div>
     </div>
 
-    <div>
-        Score:
-        <span id="score">0</span>
-    </div>
+    <div>Score: <span id="score">0</span></div>
+    <div>Level: <span id="level">1</span></div>
+    <div>XP: <span id="xp">0</span></div>
 
-    <div>
-        Level:
-        <span id="level">1</span>
-    </div>
-
-    <div>
-        XP:
-        <span id="xp">0</span>
-    </div>
-
-    <div id="weaponName">
-        Assault Rifle
-    </div>
-
+    <div id="weaponName">Assault Rifle</div>
 </div>
 
 <div id="crosshair"></div>
-
 <div id="damageFlash"></div>
 
-<div id="slideText">
-    SLIDE
-</div>
+<div id="slideText">SLIDE</div>
+<div id="jumpText">JUMP</div>
 
 <div id="weaponBar">
 
@@ -335,7 +310,6 @@ button{
     </div>
 
 </div>
-
 
 <!-- INVENTORY -->
 
@@ -398,9 +372,7 @@ button{
         <div class="weaponList" id="weaponList"></div>
 
     </div>
-
 </div>
-
 
 <!-- START -->
 
@@ -410,12 +382,12 @@ button{
 
         <h1>RIVAL ZOMBIE ARENA</h1>
 
-        <p>
-            Fast FPS zombie arena.
-        </p>
+        <p>Fast FPS zombie arena.</p>
 
         <p>
             ⬆️⬇️⬅️➡️ Move
+            <br>
+            <b>SPACE = Jump</b>
             <br>
             🖱️ Mouse = Aim
             <br>
@@ -436,9 +408,7 @@ button{
         </button>
 
     </div>
-
 </div>
-
 
 <!-- GAME OVER -->
 
@@ -458,14 +428,11 @@ button{
         </button>
 
     </div>
-
 </div>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-
 
 <script>
 
@@ -485,7 +452,6 @@ primary:[
         color:0x333333,
         bulletColor:0xffff00
     },
-
     {
         name:"Shotgun",
         type:"shotgun",
@@ -495,7 +461,6 @@ primary:[
         color:0x552211,
         bulletColor:0xffaa00
     },
-
     {
         name:"Sniper",
         type:"sniper",
@@ -505,7 +470,6 @@ primary:[
         color:0x222222,
         bulletColor:0xffffff
     },
-
     {
         name:"SMG",
         type:"smg",
@@ -515,7 +479,6 @@ primary:[
         color:0x222233,
         bulletColor:0x00ffff
     },
-
     {
         name:"Minigun",
         type:"minigun",
@@ -525,7 +488,6 @@ primary:[
         color:0x333333,
         bulletColor:0xff8800
     },
-
     {
         name:"Bow",
         type:"bow",
@@ -535,7 +497,6 @@ primary:[
         color:0x552211,
         bulletColor:0xffffff
     },
-
     {
         name:"Crossbow",
         type:"crossbow",
@@ -545,7 +506,6 @@ primary:[
         color:0x333333,
         bulletColor:0xffffff
     },
-
     {
         name:"RPG",
         type:"rpg",
@@ -555,7 +515,6 @@ primary:[
         color:0x345533,
         bulletColor:0xff4400
     },
-
     {
         name:"Grenade Launcher",
         type:"grenadelauncher",
@@ -565,7 +524,6 @@ primary:[
         color:0x444444,
         bulletColor:0xff5500
     },
-
     {
         name:"Energy Rifle",
         type:"energy",
@@ -587,7 +545,6 @@ secondary:[
         color:0x222222,
         bulletColor:0xffff00
     },
-
     {
         name:"Revolver",
         type:"gun",
@@ -597,7 +554,6 @@ secondary:[
         color:0x444444,
         bulletColor:0xffcc00
     },
-
     {
         name:"Uzi",
         type:"smg",
@@ -607,7 +563,6 @@ secondary:[
         color:0x222222,
         bulletColor:0xffee00
     },
-
     {
         name:"Flare Gun",
         type:"gun",
@@ -617,7 +572,6 @@ secondary:[
         color:0x773322,
         bulletColor:0xff3300
     },
-
     {
         name:"Energy Pistols",
         type:"dual",
@@ -638,7 +592,6 @@ melee:[
         range:4,
         color:0xcccccc
     },
-
     {
         name:"Knife",
         type:"melee",
@@ -647,7 +600,6 @@ melee:[
         range:3,
         color:0x999999
     },
-
     {
         name:"Battle Axe",
         type:"melee",
@@ -656,7 +608,6 @@ melee:[
         range:4,
         color:0x555555
     },
-
     {
         name:"Spear",
         type:"melee",
@@ -665,7 +616,6 @@ melee:[
         range:5,
         color:0x777777
     },
-
     {
         name:"Chainsaw",
         type:"chainsaw",
@@ -674,7 +624,6 @@ melee:[
         range:3,
         color:0x444444
     },
-
     {
         name:"Fists",
         type:"melee",
@@ -695,7 +644,6 @@ special:[
         color:0x335533,
         bulletColor:0xff3300
     },
-
     {
         name:"Grenade",
         type:"grenade",
@@ -705,7 +653,6 @@ special:[
         color:0x334433,
         bulletColor:0xff5500
     },
-
     {
         name:"Grappler",
         type:"grappler",
@@ -714,7 +661,6 @@ special:[
         speed:2,
         color:0x555555
     },
-
     {
         name:"Medkit",
         type:"medkit",
@@ -722,7 +668,6 @@ special:[
         fireRate:800,
         color:0xffffff
     },
-
     {
         name:"Freeze Ray",
         type:"freeze",
@@ -732,7 +677,6 @@ special:[
         color:0x55bbff,
         bulletColor:0x00ffff
     },
-
     {
         name:"Flashbang",
         type:"flash",
@@ -742,7 +686,6 @@ special:[
         color:0xdddddd,
         bulletColor:0xffffff
     },
-
     {
         name:"Molotov",
         type:"molotov",
@@ -769,7 +712,6 @@ let loadout={
 
 let selectedLoadoutSlot="primary";
 
-
 function chooseSlot(slot){
 
     selectedLoadoutSlot=slot;
@@ -788,26 +730,19 @@ function chooseSlot(slot){
     document
         .getElementById(id)
         .classList.add("selected");
-
 }
-
 
 function buildInventory(){
 
-    const list=
-        document.getElementById("weaponList");
+    const list=document.getElementById("weaponList");
 
     list.innerHTML="";
 
+    Object.keys(weaponDatabase).forEach(category=>{
 
-    Object.keys(weaponDatabase)
-    .forEach(category=>{
+        weaponDatabase[category].forEach(weapon=>{
 
-        weaponDatabase[category]
-        .forEach(weapon=>{
-
-            const button=
-                document.createElement("button");
+            const button=document.createElement("button");
 
             button.className="weaponButton";
 
@@ -816,69 +751,46 @@ function buildInventory(){
                 <br>
                 <small>${category.toUpperCase()}</small>`;
 
-
             button.onclick=()=>{
 
-                loadout[selectedLoadoutSlot]=
-                    weapon;
+                loadout[selectedLoadoutSlot]=weapon;
 
                 updateLoadoutUI();
-
                 updateCurrentWeapon();
 
             };
-
 
             list.appendChild(button);
 
         });
 
     });
-
 }
-
 
 function updateLoadoutUI(){
 
-    document.querySelector(
-        "#loadoutPrimary span"
-    ).textContent=
+    document.querySelector("#loadoutPrimary span").textContent=
         loadout.primary.name;
 
-    document.querySelector(
-        "#loadoutSecondary span"
-    ).textContent=
+    document.querySelector("#loadoutSecondary span").textContent=
         loadout.secondary.name;
 
-    document.querySelector(
-        "#loadoutMelee span"
-    ).textContent=
+    document.querySelector("#loadoutMelee span").textContent=
         loadout.melee.name;
 
-    document.querySelector(
-        "#loadoutSpecial span"
-    ).textContent=
+    document.querySelector("#loadoutSpecial span").textContent=
         loadout.special.name;
 
-
     updateWeaponBar();
-
 }
-
 
 function getCurrentWeapon(){
 
-    if(currentSlot===1)
-        return loadout.primary;
-
-    if(currentSlot===2)
-        return loadout.secondary;
-
-    if(currentSlot===3)
-        return loadout.melee;
+    if(currentSlot===1) return loadout.primary;
+    if(currentSlot===2) return loadout.secondary;
+    if(currentSlot===3) return loadout.melee;
 
     return loadout.special;
-
 }
 
 
@@ -892,39 +804,42 @@ let renderer;
 let controls;
 
 let currentSlot=1;
-
 let lastShot=0;
-
 let shooting=false;
 
 let playerHP=100;
-
 let score=0;
-
 let xp=0;
-
 let level=1;
 
 let zombies=[];
-
 let bullets=[];
-
 let explosions=[];
+let coverBoxes=[];
 
 let keys={};
 
 let sliding=false;
-
 let slideTimer=0;
 
-let slideDirection=
-    new THREE.Vector3();
+let slideDirection=new THREE.Vector3();
 
 let gunMesh;
 
 let gameStarted=false;
-
 let gameOver=false;
+
+
+/* =========================================================
+   JUMP VARIABLES
+========================================================= */
+
+let verticalVelocity=0;
+let onGround=true;
+
+const gravity=0.012;
+const jumpPower=0.25;
+const playerRadius=.45;
 
 
 /* =========================================================
@@ -933,69 +848,33 @@ let gameOver=false;
 
 function updateHUD(){
 
-    document.getElementById(
-        "hpText"
-    ).textContent=
+    document.getElementById("hpText").textContent=
         Math.max(0,Math.round(playerHP));
 
-
-    document.getElementById(
-        "hpbar"
-    ).style.width=
+    document.getElementById("hpbar").style.width=
         Math.max(0,playerHP)+"%";
 
+    document.getElementById("score").textContent=score;
+    document.getElementById("xp").textContent=xp;
+    document.getElementById("level").textContent=level;
 
-    document.getElementById(
-        "score"
-    ).textContent=
-        score;
-
-
-    document.getElementById(
-        "xp"
-    ).textContent=
-        xp;
-
-
-    document.getElementById(
-        "level"
-    ).textContent=
-        level;
-
-
-    document.getElementById(
-        "weaponName"
-    ).textContent=
+    document.getElementById("weaponName").textContent=
         getCurrentWeapon().name;
-
 }
-
 
 function updateWeaponBar(){
 
-    document.getElementById(
-        "slot1"
-    ).innerHTML=
+    document.getElementById("slot1").innerHTML=
         `<b>1</b>PRIMARY<br>${loadout.primary.name}`;
 
-
-    document.getElementById(
-        "slot2"
-    ).innerHTML=
+    document.getElementById("slot2").innerHTML=
         `<b>2</b>SECONDARY<br>${loadout.secondary.name}`;
 
-
-    document.getElementById(
-        "slot3"
-    ).innerHTML=
+    document.getElementById("slot3").innerHTML=
         `<b>3</b>MELEE<br>${loadout.melee.name}`;
 
-
-    document.getElementById(
-        "slot4"
-    ).innerHTML=
+    document.getElementById("slot4").innerHTML=
         `<b>4</b>SPECIAL<br>${loadout.special.name}`;
-
 
     for(let i=1;i<=4;i++){
 
@@ -1005,9 +884,7 @@ function updateWeaponBar(){
                 "active",
                 i===currentSlot
             );
-
     }
-
 }
 
 
@@ -1020,267 +897,152 @@ function updateCurrentWeapon(){
     if(gunMesh){
 
         camera.remove(gunMesh);
-
         gunMesh=null;
 
     }
 
+    const weapon=getCurrentWeapon();
 
-    const weapon=
-        getCurrentWeapon();
+    if(weapon.type==="melee"){
 
-
-    if(
-        weapon.type==="melee"
-    ){
-
-        gunMesh=
-            createSword(
-                weapon.color
-            );
+        gunMesh=createSword(weapon.color);
 
     }
+    else if(weapon.type==="chainsaw"){
 
-    else if(
-        weapon.type==="chainsaw"
-    ){
-
-        gunMesh=
-            createChainsaw();
+        gunMesh=createChainsaw();
 
     }
+    else if(weapon.type==="grappler"){
 
-    else if(
-        weapon.type==="grappler"
-    ){
-
-        gunMesh=
-            createGrappler();
+        gunMesh=createGrappler();
 
     }
+    else if(weapon.type==="medkit"){
 
-    else if(
-        weapon.type==="medkit"
-    ){
-
-        gunMesh=
-            createMedkit();
+        gunMesh=createMedkit();
 
     }
-
     else{
 
-        gunMesh=
-            createGun(
-                weapon
-            );
+        gunMesh=createGun(weapon);
 
     }
-
 
     camera.add(gunMesh);
 
     updateHUD();
     updateWeaponBar();
-
 }
 
 
 /* =========================================================
-   GUN MODEL
+   GUN
 ========================================================= */
 
 function createGun(weapon){
 
-    const group=
-        new THREE.Group();
+    const group=new THREE.Group();
 
-
-    const body=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .25,.25,.9
-            ),
-            new THREE.MeshStandardMaterial({
-                color:weapon.color,
-                metalness:.8,
-                roughness:.25
-            })
-        );
-
-
-    body.position.set(
-        .35,
-        -.28,
-        -.55
+    const body=new THREE.Mesh(
+        new THREE.BoxGeometry(.25,.25,.9),
+        new THREE.MeshStandardMaterial({
+            color:weapon.color,
+            metalness:.8,
+            roughness:.25
+        })
     );
 
+    body.position.set(.35,-.28,-.55);
 
     group.add(body);
 
-
-    const barrel=
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                .055,
-                .055,
-                .7,
-                10
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x111111,
-                metalness:.9
-            })
-        );
-
-
-    barrel.rotation.x=
-        Math.PI/2;
-
-
-    barrel.position.set(
-        .35,
-        -.28,
-        -.98
+    const barrel=new THREE.Mesh(
+        new THREE.CylinderGeometry(.055,.055,.7,10),
+        new THREE.MeshStandardMaterial({
+            color:0x111111,
+            metalness:.9
+        })
     );
 
+    barrel.rotation.x=Math.PI/2;
+    barrel.position.set(.35,-.28,-.98);
 
     group.add(barrel);
 
-
-    const grip=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .14,.35,.18
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x181818
-            })
-        );
-
-
-    grip.position.set(
-        .35,
-        -.48,
-        -.35
+    const grip=new THREE.Mesh(
+        new THREE.BoxGeometry(.14,.35,.18),
+        new THREE.MeshStandardMaterial({
+            color:0x181818
+        })
     );
 
-
+    grip.position.set(.35,-.48,-.35);
     grip.rotation.x=-.2;
 
     group.add(grip);
 
-
     return group;
-
 }
-
 
 function createSword(color){
 
-    const group=
-        new THREE.Group();
+    const group=new THREE.Group();
 
-
-    const blade=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .08,
-                .08,
-                1.5
-            ),
-            new THREE.MeshStandardMaterial({
-                color:color,
-                metalness:.9
-            })
-        );
-
-
-    blade.position.set(
-        .45,
-        -.3,
-        -.8
+    const blade=new THREE.Mesh(
+        new THREE.BoxGeometry(.08,.08,1.5),
+        new THREE.MeshStandardMaterial({
+            color:color,
+            metalness:.9
+        })
     );
 
-
+    blade.position.set(.45,-.3,-.8);
     group.add(blade);
 
-
-    const handle=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .12,.12,.45
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x221100
-            })
-        );
-
-
-    handle.position.set(
-        .45,
-        -.3,
-        .1
+    const handle=new THREE.Mesh(
+        new THREE.BoxGeometry(.12,.12,.45),
+        new THREE.MeshStandardMaterial({
+            color:0x221100
+        })
     );
 
-
+    handle.position.set(.45,-.3,.1);
     group.add(handle);
 
-
     return group;
-
 }
-
 
 function createChainsaw(){
 
-    const group=
-        createGun({
-            color:0x333333
-        });
-
-
-    return group;
-
+    return createGun({
+        color:0x333333
+    });
 }
-
 
 function createGrappler(){
 
     return createGun({
         color:0x777777
     });
-
 }
-
 
 function createMedkit(){
 
-    const group=
-        new THREE.Group();
+    const group=new THREE.Group();
 
-
-    const box=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .5,.3,.7
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0xffffff
-            })
-        );
-
-
-    box.position.set(
-        .35,-.3,-.5
+    const box=new THREE.Mesh(
+        new THREE.BoxGeometry(.5,.3,.7),
+        new THREE.MeshStandardMaterial({
+            color:0xffffff
+        })
     );
 
+    box.position.set(.35,-.3,-.5);
 
     group.add(box);
 
-
     return group;
-
 }
 
 
@@ -1290,63 +1052,49 @@ function createMedkit(){
 
 function init(){
 
-    scene=
-        new THREE.Scene();
+    scene=new THREE.Scene();
 
+    scene.background=new THREE.Color(0x090914);
 
-    scene.background=
-        new THREE.Color(
-            0x090914
-        );
-
-
-    scene.fog=
-        new THREE.FogExp2(
-            0x090914,
-            .018
-        );
-
-
-    camera=
-        new THREE.PerspectiveCamera(
-            75,
-            innerWidth/innerHeight,
-            .1,
-            1000
-        );
-
-
-    camera.position.set(
-        0,2,8
+    scene.fog=new THREE.FogExp2(
+        0x090914,
+        .018
     );
 
+    camera=new THREE.PerspectiveCamera(
+        75,
+        innerWidth/innerHeight,
+        .1,
+        1000
+    );
 
-    renderer=
-        new THREE.WebGLRenderer({
-            antialias:true
-        });
+    /*
+     * Player eye height.
+     * PointerLockControls uses this position
+     * as the player's position.
+     */
 
+    camera.position.set(0,0,8);
+
+    renderer=new THREE.WebGLRenderer({
+        antialias:true
+    });
 
     renderer.setSize(
         innerWidth,
         innerHeight
     );
 
-
     renderer.shadowMap.enabled=true;
-
 
     document.body.appendChild(
         renderer.domElement
     );
 
-
-    controls=
-        new THREE.PointerLockControls(
-            camera,
-            document.body
-        );
-
+    controls=new THREE.PointerLockControls(
+        camera,
+        document.body
+    );
 
     scene.add(camera);
 
@@ -1360,44 +1108,35 @@ function init(){
         )
     );
 
-
-    const light=
-        new THREE.DirectionalLight(
-            0xffffff,
-            1.4
-        );
-
+    const light=new THREE.DirectionalLight(
+        0xffffff,
+        1.4
+    );
 
     light.position.set(
         20,40,20
     );
 
-
     light.castShadow=true;
-
 
     scene.add(light);
 
 
     /* FLOOR */
 
-    const floor=
-        new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                160,160
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x171722
-            })
-        );
+    const floor=new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            160,
+            160
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x171722
+        })
+    );
 
-
-    floor.rotation.x=
-        -Math.PI/2;
-
+    floor.rotation.x=-Math.PI/2;
 
     floor.receiveShadow=true;
-
 
     scene.add(floor);
 
@@ -1416,69 +1155,61 @@ function init(){
 
     /* WALLS */
 
-    createWall(
-        0,4,-45,
-        90,2
-    );
-
-    createWall(
-        0,4,45,
-        90,2
-    );
-
-    createWall(
-        -45,4,0,
-        2,90
-    );
-
-    createWall(
-        45,4,0,
-        2,90
-    );
+    createWall(0,4,-45,90,2);
+    createWall(0,4,45,90,2);
+    createWall(-45,4,0,2,90);
+    createWall(45,4,0,2,90);
 
 
-    /* COVER */
+    /* =====================================================
+       COVER BOXES
+    ===================================================== */
 
-    for(
-        let i=0;
-        i<25;
-        i++
-    ){
+    for(let i=0;i<25;i++){
 
-        const box=
-            new THREE.Mesh(
-                new THREE.BoxGeometry(
-                    4,
-                    3,
-                    4
-                ),
-                new THREE.MeshStandardMaterial({
-                    color:0x303044
-                })
-            );
+        const width=4;
+        const height=3;
+        const depth=4;
 
+        const box=new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x303044
+            })
+        );
 
         box.position.set(
             (Math.random()-.5)*70,
-            1.5,
+            height/2,
             (Math.random()-.5)*70
         );
 
-
         box.castShadow=true;
+        box.receiveShadow=true;
 
         scene.add(box);
+
+        /*
+         * Save box information for collision.
+         */
+
+        coverBoxes.push({
+            mesh:box,
+            halfX:width/2,
+            halfY:height/2,
+            halfZ:depth/2
+        });
 
     }
 
 
     /* ZOMBIES */
 
-    for(
-        let i=0;
-        i<15;
-        i++
-    ){
+    for(let i=0;i<15;i++){
 
         spawnZombie();
 
@@ -1495,7 +1226,6 @@ function init(){
         handleKeyDown
     );
 
-
     window.addEventListener(
         "keyup",
         e=>{
@@ -1503,6 +1233,8 @@ function init(){
         }
     );
 
+
+    /* MOUSE */
 
     window.addEventListener(
         "mousedown",
@@ -1519,7 +1251,6 @@ function init(){
 
         }
     );
-
 
     window.addEventListener(
         "mouseup",
@@ -1584,6 +1315,42 @@ function handleKeyDown(e){
     }
 
 
+    /* JUMP */
+
+    if(e.code==="Space"){
+
+        e.preventDefault();
+
+        if(
+            controls.isLocked &&
+            onGround &&
+            !sliding &&
+            !gameOver
+        ){
+
+            verticalVelocity=jumpPower;
+
+            onGround=false;
+
+            const jumpText=
+                document.getElementById(
+                    "jumpText"
+                );
+
+            jumpText.style.opacity=1;
+
+            setTimeout(
+                ()=>{
+                    jumpText.style.opacity=0;
+                },
+                250
+            );
+
+        }
+
+    }
+
+
     if(e.code==="Digit1")
         selectSlot(1);
 
@@ -1631,7 +1398,6 @@ function toggleInventory(){
             "inventory"
         );
 
-
     if(
         inventory.style.display==="block"
     ){
@@ -1644,9 +1410,7 @@ function toggleInventory(){
         openInventory();
 
     }
-
 }
-
 
 function openInventory(){
 
@@ -1656,19 +1420,15 @@ function openInventory(){
         "inventory"
     ).style.display="block";
 
-
     if(controls.isLocked)
         controls.unlock();
-
 }
-
 
 function closeInventory(){
 
     document.getElementById(
         "inventory"
     ).style.display="none";
-
 
     if(
         gameStarted &&
@@ -1678,9 +1438,7 @@ function closeInventory(){
         controls.lock();
 
     }
-
 }
-
 
 function selectSlot(slot){
 
@@ -1699,24 +1457,22 @@ function createWall(
     x,y,z,w,d
 ){
 
-    const wall=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                w,8,d
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x252538
-            })
-        );
-
+    const wall=new THREE.Mesh(
+        new THREE.BoxGeometry(
+            w,
+            8,
+            d
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x252538
+        })
+    );
 
     wall.position.set(
         x,y,z
     );
 
-
     scene.add(wall);
-
 }
 
 
@@ -1726,62 +1482,54 @@ function createWall(
 
 function spawnZombie(){
 
-    const zombie=
-        new THREE.Group();
+    const zombie=new THREE.Group();
 
 
-    const body=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                1.1,
-                1.4,
-                .7
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x4caa4c
-            })
-        );
-
+    const body=new THREE.Mesh(
+        new THREE.BoxGeometry(
+            1.1,
+            1.4,
+            .7
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x4caa4c
+        })
+    );
 
     body.position.y=1.4;
 
     zombie.add(body);
 
 
-    const head=
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .8,
-                .8,
-                .8
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x72c957
-            })
-        );
-
+    const head=new THREE.Mesh(
+        new THREE.BoxGeometry(
+            .8,
+            .8,
+            .8
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x72c957
+        })
+    );
 
     head.position.y=2.5;
 
     zombie.add(head);
 
 
-    const armGeo=
-        new THREE.BoxGeometry(
-            .3,
-            1.2,
-            .3
-        );
+    const armGeo=new THREE.BoxGeometry(
+        .3,
+        1.2,
+        .3
+    );
 
 
-    const arm1=
-        new THREE.Mesh(
-            armGeo,
-            new THREE.MeshStandardMaterial({
-                color:0x72c957
-            })
-        );
-
+    const arm1=new THREE.Mesh(
+        armGeo,
+        new THREE.MeshStandardMaterial({
+            color:0x72c957
+        })
+    );
 
     arm1.position.set(
         -.7,
@@ -1789,13 +1537,10 @@ function spawnZombie(){
         0
     );
 
-
     zombie.add(arm1);
 
 
-    const arm2=
-        arm1.clone();
-
+    const arm2=arm1.clone();
 
     arm2.position.x=.7;
 
@@ -1804,7 +1549,6 @@ function spawnZombie(){
 
     const angle=
         Math.random()*Math.PI*2;
-
 
     const distance=
         25+Math.random()*25;
@@ -1828,7 +1572,6 @@ function spawnZombie(){
     scene.add(zombie);
 
     zombies.push(zombie);
-
 }
 
 
@@ -1845,6 +1588,14 @@ function updateMovement(){
         return;
 
 
+    const player=
+        controls.getObject().position;
+
+
+    /* =====================================================
+       HORIZONTAL MOVEMENT
+    ===================================================== */
+
     if(sliding){
 
         camera.position.add(
@@ -1853,12 +1604,14 @@ function updateMovement(){
 
         slideTimer--;
 
-
         if(slideTimer<=0){
 
             sliding=false;
 
-            camera.position.y=2;
+            /*
+             * Do not change Y here.
+             * Jumping/box collision controls Y.
+             */
 
             document.getElementById(
                 "slideText"
@@ -1871,18 +1624,14 @@ function updateMovement(){
 
         const speed=.13;
 
-
         if(keys.ArrowUp)
             controls.moveForward(speed);
-
 
         if(keys.ArrowDown)
             controls.moveForward(-speed);
 
-
         if(keys.ArrowLeft)
             controls.moveRight(-speed);
-
 
         if(keys.ArrowRight)
             controls.moveRight(speed);
@@ -1890,38 +1639,200 @@ function updateMovement(){
     }
 
 
-    const p=
-        controls.getObject().position;
+    /* =====================================================
+       GRAVITY
+    ===================================================== */
+
+    verticalVelocity-=gravity;
+
+    player.y+=verticalVelocity;
 
 
-    p.x=
+    /* =====================================================
+       FLOOR
+    ===================================================== */
+
+    if(player.y<=0){
+
+        player.y=0;
+
+        verticalVelocity=0;
+
+        onGround=true;
+
+    }
+
+
+    /* =====================================================
+       BOX COLLISION
+    ===================================================== */
+
+    coverBoxes.forEach(boxData=>{
+
+        const box=boxData.mesh;
+
+        const halfX=boxData.halfX;
+        const halfZ=boxData.halfZ;
+
+        const boxBottom=
+            box.position.y-boxData.halfY;
+
+        const boxTop=
+            box.position.y+boxData.halfY;
+
+
+        /*
+         * Find the closest point on the box
+         * to the player.
+         */
+
+        const closestX=
+            Math.max(
+                box.position.x-halfX,
+                Math.min(
+                    player.x,
+                    box.position.x+halfX
+                )
+            );
+
+        const closestZ=
+            Math.max(
+                box.position.z-halfZ,
+                Math.min(
+                    player.z,
+                    box.position.z+halfZ
+                )
+            );
+
+
+        const dx=
+            player.x-closestX;
+
+        const dz=
+            player.z-closestZ;
+
+        const horizontalDistance=
+            Math.sqrt(
+                dx*dx+
+                dz*dz
+            );
+
+
+        /* =================================================
+           LAND ON TOP OF BOX
+        ================================================= */
+
+        if(
+            horizontalDistance<=playerRadius &&
+            verticalVelocity<=0 &&
+            player.y>=boxTop-.45 &&
+            player.y<=boxTop+.5
+        ){
+
+            player.y=boxTop;
+
+            verticalVelocity=0;
+
+            onGround=true;
+
+        }
+
+
+        /* =================================================
+           BOX SIDE COLLISION
+        ================================================= */
+
+        else if(
+            horizontalDistance<playerRadius &&
+            player.y<boxTop-.45 &&
+            player.y>boxBottom
+        ){
+
+            if(
+                Math.abs(dx)>
+                Math.abs(dz)
+            ){
+
+                if(dx>0){
+
+                    player.x=
+                        box.position.x+
+                        halfX+
+                        playerRadius;
+
+                }
+                else{
+
+                    player.x=
+                        box.position.x-
+                        halfX-
+                        playerRadius;
+
+                }
+
+            }
+            else{
+
+                if(dz>0){
+
+                    player.z=
+                        box.position.z+
+                        halfZ+
+                        playerRadius;
+
+                }
+                else{
+
+                    player.z=
+                        box.position.z-
+                        halfZ-
+                        playerRadius;
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    /* =====================================================
+       ARENA BOUNDS
+    ===================================================== */
+
+    player.x=
         Math.max(
             -42,
-            Math.min(42,p.x)
+            Math.min(
+                42,
+                player.x
+            )
+        );
+
+    player.z=
+        Math.max(
+            -42,
+            Math.min(
+                42,
+                player.z
+            )
         );
 
 
-    p.z=
-        Math.max(
-            -42,
-            Math.min(42,p.z)
-        );
-
-
-    /*
-     * PLAYER-ZOMBIE COLLISION
-     *
-     * Prevents walking through zombies.
-     */
+    /* =====================================================
+       ZOMBIE COLLISION
+    ===================================================== */
 
     zombies.forEach(zombie=>{
 
         const dx=
-            p.x-zombie.position.x;
+            player.x-
+            zombie.position.x;
 
         const dz=
-            p.z-zombie.position.z;
-
+            player.z-
+            zombie.position.z;
 
         const distance=
             Math.sqrt(
@@ -1929,27 +1840,31 @@ function updateMovement(){
                 dz*dz
             );
 
+        const minimum=1.55;
 
-        const minimum=
-            1.55;
 
+        /*
+         * If you're standing above a zombie,
+         * don't let the zombie push you around.
+         */
 
         if(
-            distance<minimum
+            distance<minimum &&
+            player.y<1.5
         ){
 
             if(distance<.001){
 
-                p.x+=minimum;
+                player.x+=minimum;
 
             }
             else{
 
-                p.x=
+                player.x=
                     zombie.position.x+
                     dx/distance*minimum;
 
-                p.z=
+                player.z=
                     zombie.position.z+
                     dz/distance*minimum;
 
@@ -1968,24 +1883,25 @@ function updateMovement(){
 
 function startSlide(){
 
+    if(!onGround)
+        return;
+
     sliding=true;
 
     slideTimer=25;
 
-    camera.position.y=1.15;
+    camera.position.y=-.85;
 
 
     camera.getWorldDirection(
         slideDirection
     );
 
-
     slideDirection.y=0;
 
 
     if(
-        slideDirection.lengthSq()<
-        .001
+        slideDirection.lengthSq()<.001
     ){
 
         slideDirection.set(
@@ -2005,7 +1921,6 @@ function startSlide(){
     document.getElementById(
         "slideText"
     ).style.opacity=1;
-
 }
 
 
@@ -2015,20 +1930,15 @@ function startSlide(){
 
 function shoot(){
 
-    const weapon=
-        getCurrentWeapon();
+    const weapon=getCurrentWeapon();
 
-
-    const now=
-        performance.now();
-
+    const now=performance.now();
 
     if(
         now-lastShot<
         weapon.fireRate
     )
         return;
-
 
     lastShot=now;
 
@@ -2040,9 +1950,7 @@ function shoot(){
         weapon.type==="chainsaw"
     ){
 
-        meleeAttack(
-            weapon
-        );
+        meleeAttack(weapon);
 
         return;
 
@@ -2051,9 +1959,7 @@ function shoot(){
 
     /* MEDKIT */
 
-    if(
-        weapon.type==="medkit"
-    ){
+    if(weapon.type==="medkit"){
 
         playerHP=
             Math.min(
@@ -2070,13 +1976,9 @@ function shoot(){
 
     /* GRAPPLER */
 
-    if(
-        weapon.type==="grappler"
-    ){
+    if(weapon.type==="grappler"){
 
-        const dir=
-            getDirection();
-
+        const dir=getDirection();
 
         camera.position.addScaledVector(
             dir,
@@ -2090,27 +1992,16 @@ function shoot(){
 
     let count=1;
 
-
-    if(
-        weapon.type==="shotgun"
-    )
+    if(weapon.type==="shotgun")
         count=8;
 
-
-    if(
-        weapon.type==="dual"
-    )
+    if(weapon.type==="dual")
         count=2;
 
 
-    for(
-        let i=0;
-        i<count;
-        i++
-    ){
+    for(let i=0;i<count;i++){
 
-        const dir=
-            getDirection();
+        const dir=getDirection();
 
 
         if(count>1){
@@ -2136,14 +2027,11 @@ function shoot(){
 
             direction:dir,
 
-            speed:
-                weapon.speed,
+            speed:weapon.speed,
 
-            damage:
-                weapon.damage,
+            damage:weapon.damage,
 
-            type:
-                weapon.type,
+            type:weapon.type,
 
             color:
                 weapon.bulletColor ||
@@ -2172,7 +2060,6 @@ function getDirection(){
     );
 
     return direction;
-
 }
 
 
@@ -2183,8 +2070,7 @@ function getDirection(){
 function meleeAttack(weapon){
 
     const player=
-        camera.position;
-
+        controls.getObject().position;
 
     const direction=
         getDirection();
@@ -2196,7 +2082,6 @@ function meleeAttack(weapon){
             const toZombie=
                 zombie.position.clone()
                 .sub(player);
-
 
             const distance=
                 toZombie.length();
@@ -2227,12 +2112,11 @@ function meleeAttack(weapon){
 
         }
     );
-
 }
 
 
 /* =========================================================
-   BULLET UPDATE
+   BULLETS
 ========================================================= */
 
 function updateBullets(){
@@ -2243,18 +2127,14 @@ function updateBullets(){
         i--
     ){
 
-        const bullet=
-            bullets[i];
-
+        const bullet=bullets[i];
 
         bullet.position.addScaledVector(
             bullet.direction,
             bullet.speed
         );
 
-
         bullet.life--;
-
 
         let hit=false;
 
@@ -2270,8 +2150,7 @@ function updateBullets(){
 
 
             if(
-                distance<
-                1.35
+                distance<1.35
             ){
 
                 if(
@@ -2358,9 +2237,7 @@ function damageZombie(
         xp+=20;
 
 
-        if(
-            xp>=100
-        ){
+        if(xp>=100){
 
             xp-=100;
 
@@ -2396,14 +2273,10 @@ function createExplosion(
                 );
 
 
-            if(
-                distance<7
-            ){
+            if(distance<7){
 
                 const multiplier=
-                    1-
-                    distance/7;
-
+                    1-distance/7;
 
                 damageZombie(
                     zombie,
@@ -2456,13 +2329,13 @@ function createExplosion(
 
 
 /* =========================================================
-   ZOMBIE AI + DAMAGE
+   ZOMBIE AI
 ========================================================= */
 
 function updateZombies(){
 
     const player=
-        camera.position;
+        controls.getObject().position;
 
 
     zombies.forEach(
@@ -2480,14 +2353,12 @@ function updateZombies(){
                 direction.length();
 
 
-            /*
-             * Zombie stops at this distance.
-             * This prevents it from clipping
-             * inside the player.
-             */
-
             const stopDistance=1.45;
 
+
+            /*
+             * Zombies follow horizontally.
+             */
 
             if(
                 distance>
@@ -2495,7 +2366,6 @@ function updateZombies(){
             ){
 
                 direction.normalize();
-
 
                 zombie.position.addScaledVector(
                     direction,
@@ -2514,16 +2384,15 @@ function updateZombies(){
 
             /*
              * ZOMBIE ATTACK
-             *
-             * Now zombies DO damage you.
              */
 
             if(
-                distance<
-                2.0
+                distance<2.0 &&
+                player.y<1.5
             ){
 
                 zombie.userData.attackCooldown--;
+
 
                 if(
                     zombie.userData.attackCooldown<=0
@@ -2549,7 +2418,6 @@ function updateZombies(){
                 }
 
             }
-
             else{
 
                 zombie.userData.attackCooldown=0;
@@ -2573,9 +2441,7 @@ function flashDamage(){
             "damageFlash"
         );
 
-
     flash.style.opacity=.8;
-
 
     setTimeout(
         ()=>{
@@ -2583,7 +2449,6 @@ function flashDamage(){
         },
         100
     );
-
 }
 
 
@@ -2615,28 +2480,21 @@ function endGame(){
 
 
 /* =========================================================
-   DRAW VISIBLE BULLETS
+   DRAW BULLETS
 ========================================================= */
 
 function drawBullets(){
 
-    /*
-     * Remove old visual bullets.
-     */
-
     scene.children
         .filter(
-            x=>x.userData &&
-            x.userData.visualBullet
+            x=>
+                x.userData &&
+                x.userData.visualBullet
         )
         .forEach(
             x=>scene.remove(x)
         );
 
-
-    /*
-     * Create visible bullet spheres.
-     */
 
     bullets.forEach(
         bullet=>{
@@ -2651,8 +2509,7 @@ function drawBullets(){
 
             const material=
                 new THREE.MeshBasicMaterial({
-                    color:
-                        bullet.color
+                    color:bullet.color
                 });
 
 
@@ -2680,7 +2537,7 @@ function drawBullets(){
 
 
 /* =========================================================
-   EFFECT UPDATE
+   EXPLOSIONS
 ========================================================= */
 
 function updateExplosions(){
@@ -2736,15 +2593,12 @@ function resize(){
     camera.aspect=
         innerWidth/innerHeight;
 
-
     camera.updateProjectionMatrix();
-
 
     renderer.setSize(
         innerWidth,
         innerHeight
     );
-
 }
 
 
@@ -2792,7 +2646,6 @@ function animate(){
         scene,
         camera
     );
-
 }
 
 
@@ -2810,3 +2663,4 @@ animate();
 
 </body>
 </html>
+```
