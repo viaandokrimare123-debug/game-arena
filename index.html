@@ -2611,6 +2611,40 @@ function updateZombies(){
                     zombie.userData.speed
                 );
 
+
+                // Keep zombies outside cover boxes after each movement step.
+                coverBoxes.forEach(box=>{
+
+                    const dx=
+                        zombie.position.x-box.position.x;
+
+                    const dz=
+                        zombie.position.z-box.position.z;
+
+                    const overlapX=
+                        2+zombie.userData.radius-Math.abs(dx);
+
+                    const overlapZ=
+                        2+zombie.userData.radius-Math.abs(dz);
+
+
+                    if(overlapX>0 && overlapZ>0){
+
+                        if(overlapX<overlapZ)
+                            zombie.position.x=
+                                box.position.x+
+                                (dx<0 ? -1 : 1)*
+                                (2+zombie.userData.radius);
+                        else
+                            zombie.position.z=
+                                box.position.z+
+                                (dz<0 ? -1 : 1)*
+                                (2+zombie.userData.radius);
+
+                    }
+
+                });
+
             }
 
 
