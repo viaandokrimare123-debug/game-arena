@@ -2476,23 +2476,129 @@ function updateBullets(){
             bullets[i];
 
 
+        const previousPosition=
+            bullet.position.clone();
+
+
         bullet.position.addScaledVector(
             bullet.direction,
             bullet.speed
         );
 
 
-        // Cover absorbs bullets before they can reach enemies behind it.
-        const hitCover=coverBoxes.some(box=>
-            Math.abs(bullet.position.x-box.position.x)<=2 &&
-            bullet.position.y>=box.position.y-1.5 &&
-            bullet.position.y<=box.position.y+1.5 &&
-            Math.abs(bullet.position.z-box.position.z)<=2
-        );
+        /*
+         * Ray-test the bullet's complete movement path.  This uses the real
+         * zombie body/head meshes and chooses the closest hit, so cover blocks
+         * shots before they can damage a zombie behind it.
+         */
+        const raycaster=
+            new THREE.Raycaster(
+                previousPosition,
+                bullet.direction,
+                0,
+                bullet.speed
+            );
 
-        if(hitCover){
 
-            createImpactEffect(bullet.position,0x99bbff);
+        const coverHit=
+            raycaster.intersectObjects(
+                coverBoxes,
+                false
+            )[0];
+
+
+        let zombieHit=null;
+
+
+        for(
+            const zombie of zombies
+        ){
+
+            const intersection=
+                raycaster.intersectObject(
+                    zombie,
+                    true
+                )[0];
+
+
+            if(
+                intersection &&
+                (
+                    !zombieHit ||
+                    intersection.distance<
+                    zombieHit.intersection.distance
+                )
+            ){
+
+                zombieHit={
+                    zombie:zombie,
+                    intersection:intersection
+                };
+
+            }
+
+        }
+
+
+        if(
+            coverHit &&
+            (
+                !zombieHit ||
+                coverHit.distance<=
+                zombieHit.intersection.distance
+            )
+        ){
+
+            createImpactEffect(
+                coverHit.point,
+                0x99bbff
+            );
+
+            bullets.splice(i,1);
+
+            continue;
+
+        }
+
+
+        if(zombieHit){
+
+            const impactPoint=
+                zombieHit.intersection.point;
+
+            showHitMarker();
+
+            flashZombie(
+                zombieHit.zombie
+            );
+
+            createImpactEffect(
+                impactPoint,
+                0xff7755
+            );
+
+            if(
+                bullet.type==="rpg" ||
+                bullet.type==="grenade" ||
+                bullet.type==="grenadelauncher" ||
+                bullet.type==="molotov"
+            ){
+
+                createExplosion(
+                    impactPoint,
+                    bullet.damage
+                );
+
+            }
+            else{
+
+                damageZombie(
+                    zombieHit.zombie,
+                    bullet.damage
+                );
+
+            }
+
 
             bullets.splice(i,1);
 
@@ -2504,66 +2610,7 @@ function updateBullets(){
         bullet.life--;
 
 
-        let hit=false;
-
-
-        for(
-            const zombie of zombies
-        ){
-
-            const distance=
-                zombie.position.distanceTo(
-                    bullet.position
-                );
-
-
-            if(
-                distance<
-                1.35
-            ){
-
-                showHitMarker();
-
-                flashZombie(zombie);
-
-                createImpactEffect(bullet.position,0xff7755);
-
-                if(
-                    bullet.type==="rpg" ||
-                    bullet.type==="grenade" ||
-                    bullet.type==="grenadelauncher" ||
-                    bullet.type==="molotov"
-                ){
-
-                    createExplosion(
-                        bullet.position,
-                        bullet.damage
-                    );
-
-                }
-                else{
-
-                    damageZombie(
-                        zombie,
-                        bullet.damage
-                    );
-
-                }
-
-
-                hit=true;
-
-                break;
-
-            }
-
-        }
-
-
-        if(
-            hit ||
-            bullet.life<=0
-        ){
+        if(bullet.life<=0){
 
             bullets.splice(
                 i,
