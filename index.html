@@ -911,6 +911,17 @@ let bullets=[];
 
 let explosions=[];
 
+// Cover is kept separately from the scene so it can be used for player collision.
+let coverBoxes=[];
+
+const PLAYER_HEIGHT=2;
+const PLAYER_RADIUS=.45;
+const GRAVITY=.012;
+const JUMP_SPEED=.28;
+
+let verticalVelocity=0;
+let isGrounded=true;
+
 let keys={};
 
 let sliding=false;
@@ -1469,6 +1480,8 @@ function init(){
 
         scene.add(box);
 
+        coverBoxes.push(box);
+
     }
 
 
@@ -1595,6 +1608,20 @@ function handleKeyDown(e){
 
     if(e.code==="Digit4")
         selectSlot(4);
+
+
+    if(
+        e.code==="Space" &&
+        isGrounded &&
+        controls.isLocked &&
+        !sliding
+    ){
+
+        verticalVelocity=JUMP_SPEED;
+        isGrounded=false;
+        e.preventDefault();
+
+    }
 
 
     if(e.code==="KeyC"){
@@ -1906,6 +1933,88 @@ function updateMovement(){
             -42,
             Math.min(42,p.z)
         );
+
+
+    if(!sliding){
+
+        const previousY=p.y;
+
+        verticalVelocity-=GRAVITY;
+        p.y+=verticalVelocity;
+        isGrounded=false;
+
+
+        // Land on the floor or on a cover box while falling.
+        let landingY=PLAYER_HEIGHT;
+
+        coverBoxes.forEach(box=>{
+
+            const halfWidth=2;
+            const halfDepth=2;
+            const boxTop=box.position.y+1.5;
+            const wasAbove=previousY-PLAYER_HEIGHT>=boxTop-.02;
+            const crossedTop=p.y-PLAYER_HEIGHT<=boxTop;
+            const overlapsTop=
+                Math.abs(p.x-box.position.x)<halfWidth-PLAYER_RADIUS &&
+                Math.abs(p.z-box.position.z)<halfDepth-PLAYER_RADIUS;
+
+            if(
+                verticalVelocity<=0 &&
+                wasAbove &&
+                crossedTop &&
+                overlapsTop
+            ){
+
+                landingY=Math.max(
+                    landingY,
+                    boxTop+PLAYER_HEIGHT
+                );
+
+            }
+
+        });
+
+
+        if(p.y<=landingY){
+
+            p.y=landingY;
+            verticalVelocity=0;
+            isGrounded=true;
+
+        }
+
+    }
+
+
+    // Keep the player outside the sides of cover boxes without pushing them
+    // away when they are standing on top.
+    coverBoxes.forEach(box=>{
+
+        const boxTop=box.position.y+1.5;
+        const boxBottom=box.position.y-1.5;
+        const playerFeet=p.y-PLAYER_HEIGHT;
+
+        if(
+            playerFeet>=boxTop-.01 ||
+            p.y<=boxBottom
+        )
+            return;
+
+        const dx=p.x-box.position.x;
+        const dz=p.z-box.position.z;
+        const overlapX=2+PLAYER_RADIUS-Math.abs(dx);
+        const overlapZ=2+PLAYER_RADIUS-Math.abs(dz);
+
+        if(overlapX>0 && overlapZ>0){
+
+            if(overlapX<overlapZ)
+                p.x=box.position.x+(dx<0 ? -1 : 1)*(2+PLAYER_RADIUS);
+            else
+                p.z=box.position.z+(dz<0 ? -1 : 1)*(2+PLAYER_RADIUS);
+
+        }
+
+    });
 
 
     /*
