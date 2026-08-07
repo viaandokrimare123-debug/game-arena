@@ -937,6 +937,9 @@ let explosions=[];
 
 let impactEffects=[];
 
+// Tracks only the pitch added by firing, so it can be returned without affecting aim.
+let recoilOffset=0;
+
 // Cover is kept separately from the scene so it can be used for player collision.
 let coverBoxes=[];
 
@@ -1062,6 +1065,24 @@ function flashZombie(zombie){
         }
 
     });
+
+}
+
+
+function updateRecoil(){
+
+    if(recoilOffset<=0)
+        return;
+
+    const recovery=
+        Math.min(
+            recoilOffset,
+            .0012
+        );
+
+    camera.rotation.x+=recovery;
+
+    recoilOffset-=recovery;
 
 }
 
@@ -2229,8 +2250,16 @@ function shoot(){
 
     lastShot=now;
 
-    // A small recoil kick makes each shot feel physical.
-    camera.rotation.x-=.008;
+    // Keep recoil temporary so it never leaves the camera tilted.
+    const recoilKick=
+        Math.min(
+            .008,
+            .06-recoilOffset
+        );
+
+    camera.rotation.x-=recoilKick;
+
+    recoilOffset+=recoilKick;
 
 
     /* MELEE */
@@ -3064,6 +3093,8 @@ function animate(){
 
         }
 
+
+        updateRecoil();
 
         updateBullets();
 
