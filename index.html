@@ -85,6 +85,26 @@ canvas{
     top:0;
 }
 
+#hitMarker{
+    position:fixed;
+    left:50%;
+    top:50%;
+    z-index:35;
+    color:#fff;
+    font-size:32px;
+    font-weight:bold;
+    pointer-events:none;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.6);
+    text-shadow:0 0 8px #fff;
+    transition:opacity .08s,transform .08s;
+}
+
+#hitMarker.active{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+}
+
 /* WEAPON BAR */
 
 #weaponBar{
@@ -298,6 +318,8 @@ button{
 
 <div id="crosshair"></div>
 
+<div id="hitMarker">✕</div>
+
 <div id="damageFlash"></div>
 
 <div id="slideText">
@@ -415,7 +437,9 @@ button{
         </p>
 
         <p>
-            ⬆️⬇️⬅️➡️ Move
+            WASD / ⬆️⬇️⬅️➡️ = Move
+            <br>
+            SPACE = Jump
             <br>
             🖱️ Mouse = Aim
             <br>
@@ -911,6 +935,8 @@ let bullets=[];
 
 let explosions=[];
 
+let impactEffects=[];
+
 // Cover is kept separately from the scene so it can be used for player collision.
 let coverBoxes=[];
 
@@ -978,6 +1004,64 @@ function updateHUD(){
         "weaponName"
     ).textContent=
         getCurrentWeapon().name;
+
+}
+
+
+function showHitMarker(){
+
+    const marker=document.getElementById("hitMarker");
+
+    marker.classList.remove("active");
+
+    requestAnimationFrame(()=>marker.classList.add("active"));
+
+    clearTimeout(marker.userData.hideTimer);
+
+    marker.userData.hideTimer=setTimeout(
+        ()=>marker.classList.remove("active"),
+        90
+    );
+
+}
+
+
+function createImpactEffect(position,color=0xffcc66){
+
+    const mesh=new THREE.Mesh(
+        new THREE.SphereGeometry(.12,8,8),
+        new THREE.MeshBasicMaterial({
+            color:color,
+            transparent:true,
+            opacity:1
+        })
+    );
+
+    mesh.position.copy(position);
+
+    scene.add(mesh);
+
+    impactEffects.push({mesh:mesh,life:8});
+
+}
+
+
+function flashZombie(zombie){
+
+    zombie.traverse(part=>{
+
+        if(part.isMesh && part.material.emissive){
+
+            part.material.emissive.setHex(0x661111);
+
+            setTimeout(
+                ()=>part.material.emissive.setHex(0x000000),
+                70
+            );
+
+        }
+
+    });
 
 }
 
@@ -1589,7 +1673,11 @@ function handleKeyDown(e){
         e.code==="ArrowUp" ||
         e.code==="ArrowDown" ||
         e.code==="ArrowLeft" ||
-        e.code==="ArrowRight"
+        e.code==="ArrowRight" ||
+        e.code==="KeyW" ||
+        e.code==="KeyA" ||
+        e.code==="KeyS" ||
+        e.code==="KeyD"
     ){
 
         e.preventDefault();
@@ -1899,19 +1987,19 @@ function updateMovement(){
         const speed=.13;
 
 
-        if(keys.ArrowUp)
+        if(keys.ArrowUp || keys.KeyW)
             controls.moveForward(speed);
 
 
-        if(keys.ArrowDown)
+        if(keys.ArrowDown || keys.KeyS)
             controls.moveForward(-speed);
 
 
-        if(keys.ArrowLeft)
+        if(keys.ArrowLeft || keys.KeyA)
             controls.moveRight(-speed);
 
 
-        if(keys.ArrowRight)
+        if(keys.ArrowRight || keys.KeyD)
             controls.moveRight(speed);
 
     }
@@ -2141,6 +2229,9 @@ function shoot(){
 
     lastShot=now;
 
+    // A small recoil kick makes each shot feel physical.
+    camera.rotation.x-=.008;
+
 
     /* MELEE */
 
@@ -2362,6 +2453,25 @@ function updateBullets(){
         );
 
 
+        // Cover absorbs bullets before they can reach enemies behind it.
+        const hitCover=coverBoxes.some(box=>
+            Math.abs(bullet.position.x-box.position.x)<=2 &&
+            bullet.position.y>=box.position.y-1.5 &&
+            bullet.position.y<=box.position.y+1.5 &&
+            Math.abs(bullet.position.z-box.position.z)<=2
+        );
+
+        if(hitCover){
+
+            createImpactEffect(bullet.position,0x99bbff);
+
+            bullets.splice(i,1);
+
+            continue;
+
+        }
+
+
         bullet.life--;
 
 
@@ -2382,6 +2492,12 @@ function updateBullets(){
                 distance<
                 1.35
             ){
+
+                showHitMarker();
+
+                flashZombie(zombie);
+
+                createImpactEffect(bullet.position,0xff7755);
 
                 if(
                     bullet.type==="rpg" ||
@@ -2826,6 +2942,35 @@ function drawBullets(){
    EFFECT UPDATE
 ========================================================= */
 
+function updateImpactEffects(){
+
+    for(
+        let i=impactEffects.length-1;
+        i>=0;
+        i--
+    ){
+
+        const effect=impactEffects[i];
+
+        effect.mesh.scale.multiplyScalar(1.25);
+
+        effect.mesh.material.opacity*=.75;
+
+        effect.life--;
+
+        if(effect.life<=0){
+
+            scene.remove(effect.mesh);
+
+            impactEffects.splice(i,1);
+
+        }
+
+    }
+
+}
+
+
 function updateExplosions(){
 
     for(
@@ -2925,6 +3070,8 @@ function animate(){
         updateZombies();
 
         updateExplosions();
+
+        updateImpactEffects();
 
         drawBullets();
 
